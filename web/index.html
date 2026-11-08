@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b101a" />
+  <meta name="description" content="Ripple turns policy changes into traceable outcome changes." />
+  <title>Ripple — The Consequence Engine</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+<div class="app-shell">
+  <aside class="side-rail">
+    <div class="logo-wrap" title="Ripple"><span class="logo">r<span class="dot">.</span></span></div>
+    <div class="nav-group">
+      <div class="rail-item active" title="Impact Studio" aria-label="Impact Studio">◈</div>
+      <div class="rail-item" title="Evidence" aria-label="Evidence">⌁</div>
+      <div class="rail-item" title="Test cases" aria-label="Test cases">⊞</div>
+    </div>
+    <div class="rail-bottom">01<span> / 03</span></div>
+  </aside>
+  <div class="site-main">
+    <header class="topbar">
+      <div class="breadcrumbs"><span>RIPPLE</span><span class="slash">/</span><span>IMPACT STUDIO</span></div>
+      <div class="topbar-end"><span class="signal"><span class="signal-dot"></span><span id="api-status">Checking system</span></span><span class="avatar">R</span></div>
+    </header>
+    <main class="content">
+      <section class="intro">
+        <div class="eyebrow"><span class="small-circle"></span> DECISION INTELLIGENCE, WITH PROOF</div>
+        <h1>Small edits.<br /><span>Massive consequences.</span></h1>
+        <div class="intro-bottom"><p>Compare two policies. Explore who gains or loses eligibility. Trace every outcome back to its source.</p><span class="intro-number">01 <span>—</span> 04</span></div>
+      </section>
+      <div class="dashboard-grid">
+        <div class="left-column">
+          <section class="panel editor-panel">
+            <div class="section-heading"><span class="section-index">01</span><h2>Source policies</h2><span class="heading-right">INPUT</span></div>
+            <div class="editor-head"><div class="version-label"><span class="version-dot old"></span> PREVIOUS <span class="mini-text">V1</span></div><span class="tag-muted">Text input</span></div>
+            <textarea id="old-policy" spellcheck="false" aria-label="Previous policy text" placeholder="Paste the original policy text..."></textarea>
+            <div class="editor-head second"><div class="version-label"><span class="version-dot new"></span> CURRENT <span class="mini-text">V2</span></div><span class="tag-muted">Text input</span></div>
+            <textarea id="new-policy" spellcheck="false" aria-label="Current policy text" placeholder="Paste the updated policy text..."></textarea>
+            <div class="editor-actions">
+              <button type="button" id="reset-demo" class="btn btn-subtle">↺ &nbsp;Reset demo</button>
+              <button type="button" id="analyze-live" class="btn btn-primary">Analyze live <span>↗</span></button>
+            </div>
+            <div class="microcopy">Live analysis requires a server-side Clocked API key. Demo data is explicitly synthetic.</div>
+          </section>
+          <section class="panel delta-panel" id="evidence">
+            <div class="section-heading"><span class="section-index">02</span><h2>The policy delta</h2></div>
+            <p class="panel-subtitle">The exact thresholds that govern this demonstration.</p>
+            <div id="delta-items"></div>
+            <div id="compare-verdict" class="api-result" hidden></div>
+            <div id="review-warning" class="review-warning" hidden>Some thresholds lack verified source evidence. Those evaluations are marked for review.</div>
+          </section>
+        </div>
+        <div class="right-column">
+          <section class="panel overview-panel">
+            <div class="overview-top"><div><div class="section-heading"><span class="section-index">03</span><h2>Impact analysis</h2></div><p class="panel-subtitle">An auditable cohort comparison, not an estimated impact.</p></div><span id="mode-indicator" class="mode-badge">SYNTHETIC DEMO</span></div>
+            <div class="stat-grid">
+              <div class="stat"><span class="stat-label">TOTAL CASES</span><strong id="stat-total">—</strong><span class="stat-meta">Synthetic applicants</span></div>
+              <div class="stat stat-lost"><span class="stat-label">LOST ELIGIBILITY</span><strong id="stat-lost">—</strong><span class="stat-meta">Now not eligible</span></div>
+              <div class="stat stat-gained"><span class="stat-label">GAINED ELIGIBILITY</span><strong id="stat-gained">—</strong><span class="stat-meta">Now eligible</span></div>
+              <div class="stat"><span class="stat-label">NEEDS REVIEW</span><strong id="stat-review">—</strong><span class="stat-meta">Insufficient evidence</span></div>
+            </div>
+            <div class="chart-title"><strong>Outcome distribution</strong><span>Before → after</span></div>
+            <div id="dist-bar" class="dist-bar" aria-label="Outcome distribution" role="img"></div>
+            <div id="dist-legend" class="dist-legend"></div>
+          </section>
+          <section class="panel matrix-panel" id="cases">
+            <div class="section-heading"><span class="section-index">04</span><h2>Decision flips</h2><span class="heading-right">CLICK A CASE</span></div>
+            <p class="panel-subtitle">Every dot is a synthetic applicant. Select one to investigate the reason.</p>
+            <div class="matrix-labels"><span>BEFORE</span><span>AFTER</span></div>
+            <div id="case-matrix" class="case-matrix"></div>
+            <div class="matrix-footnote">● Lost eligibility &nbsp; <span class="gained-color">● Gained</span> &nbsp; <span class="stable-color">● Unchanged</span> &nbsp; <span class="review-color">● Review</span></div>
+          </section>
+          <section class="panel inspector-panel">
+            <div class="inspector-top"><div><span class="eyebrow in-panel">CASE EXPLORER</span><h2 id="selected-case-title">Applicant 01</h2></div><span id="selected-transition" class="case-chip">—</span></div>
+            <div class="controls-row">
+              <div class="control-block"><label for="gpa-range">Cumulative GPA <span id="gpa-value">3.30</span></label><input id="gpa-range" type="range" min="0" max="4" step="0.05" /></div>
+              <div class="control-block"><label for="income-range">Annual income <span id="income-value">$36,000</span></label><input id="income-range" type="range" min="0" max="100000" step="1000" /></div>
+            </div>
+            <div class="results-grid">
+              <div class="result-block"><span>PREVIOUS POLICY</span><strong id="before-status">Eligible</strong><small id="before-reason">—</small></div>
+              <div class="result-arrow">→</div>
+              <div class="result-block"><span>CURRENT POLICY</span><strong id="after-status">Not eligible</strong><small id="after-reason">—</small></div>
+            </div>
+            <div class="inspector-footer"><div class="what-if-label">◈ &nbsp;WHAT-IF MODE <span id="what-if-note">Adjust the sliders to test another scenario.</span></div><button class="btn btn-subtle btn-small" id="reset-case">Reset case</button></div>
+            <div class="flip-panel">
+              <div class="flip-head"><div><span class="flip-kicker">DECISION FLIP PATH</span><h3>What would change the outcome?</h3></div><span class="flip-tag">RULE-BASED</span></div>
+              <div id="flip-content" aria-live="polite"></div>
+              <button type="button" class="btn btn-primary flip-action" id="apply-flip" hidden>Try these thresholds ↗</button>
+              <p class="flip-disclaimer">Threshold simulation only. Not a scholarship recommendation or guarantee of eligibility.</p>
+            </div>
+            <div class="proof-title">SOURCE EVIDENCE <span>VERBATIM</span></div>
+            <div class="evidence-grid"><div class="evidence-box"><span>V1 / ORIGINAL</span><p id="old-evidence">—</p><div class="source-actions"><button type="button" data-source="old" data-rule="gpa_evidence">Find GPA ↗</button><button type="button" data-source="old" data-rule="income_evidence">Find income ↗</button></div></div><div class="evidence-box"><span>V2 / UPDATED</span><p id="new-evidence">—</p><div class="source-actions"><button type="button" data-source="new" data-rule="gpa_evidence">Find GPA ↗</button><button type="button" data-source="new" data-rule="income_evidence">Find income ↗</button></div></div></div>
+            <div id="rerank-evidence" class="ranked-evidence" hidden></div>
+          </section>
+        </div>
+      </div>
+      <section class="bottom-panel"><div><span class="eyebrow in-panel">UNDER THE HOOD</span><h2>Evidence, not vibes.</h2><p id="backend-disclosure">Loading analysis details.</p></div><div class="bottom-actions"><button class="btn btn-subtle" id="toggle-trace">Inspect API trace ↗</button><button class="btn btn-primary" id="export-report">Export report ↓</button></div></section>
+      <pre id="trace-output" class="trace-output" hidden></pre>
+      <footer>RIPPLE <span>© 2026 · HACKATHON BUILD</span><span>DECISIONS ARE EXPLAINABLE. HUMAN REVIEW IS ESSENTIAL.</span></footer>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+"""Offline Chromium smoke check with the synthetic API stub.
+
+Requires: pip install playwright; a Chromium browser (set CHROMIUM_PATH or use the
+standard Playwright-managed binary). Does not make real Clocked API calls.
+"""
+import json
+import os
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from app.demo import make_demo
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "fixtures" / "screenshots"
+OUT.mkdir(parents=True, exist_ok=True)
+HTML = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+HTML = HTML.replace('<link rel="stylesheet" href="/assets/styles.css" />', "")
+HTML = HTML.replace('<script src="/assets/app.js" defer></script>', "")
+CSS = (ROOT / "web" / "styles.css").read_text(encoding="utf-8")
+# Remove only the external font import, not the semicolons within its URL.
+CSS = "\n".join(line for line in CSS.splitlines() if not line.startswith("@import "))
+JS = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+
+
+def setup(page):
+    page.set_content(HTML, wait_until="domcontentloaded")
+    page.add_style_tag(content=CSS)
+    page.evaluate("""window.fetch = async (url) => ({
+        ok: true,
+        json: async () => url === '/api/demo' ? JSON.parse(window.__fixture) : {status:'ok',live_enabled:false}
+    });""")
+    page.evaluate("data => window.__fixture = JSON.stringify(data)", make_demo())
+    page.add_script_tag(content=JS)
+    page.wait_for_selector("#case-matrix button")
+
+
+def main():
+    errors = []
+    with sync_playwright() as p:
+        opts = {"headless": True, "args": ["--no-sandbox"]}
+        if os.getenv("CHROMIUM_PATH"):
+            opts["executable_path"] = os.environ["CHROMIUM_PATH"]
+        browser = p.chromium.launch(**opts)
+        page = browser.new_page(viewport={"width": 1440, "height": 900}, device_scale_factor=1)
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        setup(page)
+        assert page.locator("#case-matrix button").count() == 16
+        assert "lost eligibility" in page.locator("#selected-transition").inner_text().lower()
+        assert "3.50" in page.locator("#flip-content").inner_text()
+        assert page.evaluate("getComputedStyle(document.documentElement).backgroundColor") == "rgb(9, 14, 23)"
+        page.screenshot(path=str(OUT / "ripple-desktop.png"), full_page=True)
+        page.locator("#apply-flip").click()
+        assert page.locator("#gpa-value").inner_text() == "3.50"
+        assert "remains eligible" in page.locator("#selected-transition").inner_text().lower()
+        page.locator('[data-source="new"][data-rule="gpa_evidence"]').click()
+        highlighted = page.locator("#new-policy").evaluate(
+            "el => el.value.substring(el.selectionStart, el.selectionEnd)"
+        )
+        assert "minimum cumulative GPA of 3.5" in highlighted
+        page.screenshot(path=str(OUT / "ripple-evidence-jump.png"), full_page=True)
+        mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
+        mobile.on("pageerror", lambda e: errors.append(str(e)))
+        setup(mobile)
+        mobile.screenshot(path=str(OUT / "ripple-mobile.png"), full_page=True)
+        assert mobile.evaluate("document.documentElement.scrollWidth") <= 390, "Mobile horizontal overflow"
+        assert not errors, errors
+        browser.close()
+    print("PASS: 16 cases, real browser flip interaction, exact evidence selection, no console errors, 390px responsive width.")
+    print("NOTE: API responses were stubbed; this was not a live-server or Clocked integration test.")
+
+
+if __name__ == "__main__":
+    main()

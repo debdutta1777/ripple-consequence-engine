@@ -1,0 +1,43 @@
+{
+  "project": "Ripple \u2014 The Consequence Engine",
+  "checkpoint_version": 1,
+  "last_updated": "2026-11-09",
+  "last_completed": "P02",
+  "current_phase": "P03",
+  "completed_phases": [
+    "P00",
+    "P01",
+    "P02"
+  ],
+  "phases": {
+    "P00": "complete",
+    "P01": "complete",
+    "P02": "complete",
+    "P03": "blocked_on_key",
+    "P04": "queued",
+    "P05": "queued",
+    "P06": "queued",
+    "P07": "queued"
+  },
+  "verified": {
+    "python_tests": "20 passed",
+    "javascript": "node --check web/app.js passed",
+    "baseline_synthetic": true,
+    "live_clocked_calls": false,
+    "browser_visual_qa": "Desktop 1440px and mobile 390px passed in isolated Chromium with synthetic fetch mock; full HTTP/browser E2E still pending",
+    "public_deployment": false,
+    "clocked_cli_smoke": "scripts/smoke_clocked.py --run prepared; no key configured",
+    "vercel_connection": "Read access confirmed; project creation denied (403 forbidden)",
+    "vercel_deployment_entrypoint": "main.py exports FastAPI app"
+  },
+  "blockers": [
+    "Vercel project creation via connected API returned 403 Forbidden; user must create/import the project through their dashboard or grant suitable project-creation permissions.",
+    "Clocked key must be entered directly in Vercel project secret settings; live SDK response shape remains unverified."
+  ],
+  "next_actions": [
+    "Create Ripple project from GitHub repository in Vercel dashboard (connected API create received 403).",
+    "Set CLOCKED_API_KEY privately as a Sensitive environment variable; keep ENABLE_LIVE=false until rate limits / controlled testing.",
+    "Verify Vercel build and /api/health and /api/demo; then controlled Clocked smoke test and finish P03."
+  ],
+  "notes": "Never infer live test success from fake/mock tests. The demonstration uses only synthetic applicants and narrow GPA/income rules."
+}
