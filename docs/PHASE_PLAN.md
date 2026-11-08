@@ -28,7 +28,7 @@ This plan turns the Clocked Build Challenge project into **small, individually v
 - [x] Add functioning case filters, direct flip exploration, and case-level explanations.
 - [x] Warn when policy edits have not been analyzed; disable live-action affordance when key unavailable.
 - [x] Test through isolated Chromium at mobile/tablet/desktop widths; verify flip, filters and evidence.
-- [ ] Confirm these UI updates are deployed to Vercel from the connected GitHub repository.
+- [x] User confirmed UI-01 light-mode redesign appeared on their Vercel URL. (2026-11-09)
 
 ## P03 — Verify live Clocked API integration [ACTIVE — NEEDS USER CONFIGURATION]
 - [ ] P03.1 User sets `CLOCKED_API_KEY` locally/inside deployment host, without posting it in chat.
@@ -38,12 +38,12 @@ This plan turns the Clocked Build Challenge project into **small, individually v
 - [ ] P03.5 Harden parser for actual live responses, semantic direction, ambiguous clauses, and failure handling. (Directional checks and unit tests done; live shape/error checks outstanding.)
 - [ ] P03.6 Record real endpoint evidence, latency/cost metadata if provided, and verified integration tests (redacted of any keys).
 
-## P04 — Genuine source evidence and PDF workflow [QUEUED]
-- [ ] P04.1 Accept constrained text-based PDF inputs, with strict file size and content validation.
+## P04 — Genuine source evidence and PDF workflow [IN PROGRESS — P04.1 VERIFIED]
+- [x] P04.1 Accept constrained text-based PDF inputs (2 MB/12 pages/12k chars), preview extracted source text and page offsets, and reject scans/passwords/corrupt/oversized files. UI: individual old/new uploaders and download-ready fictional sample PDFs. Zero Clocked calls for preview. (2026-11-09)
 - [ ] P04.2 Extract rules through Clocked PDF mode and correctly interpret its returned page offsets.
 - [ ] P04.3 Display available Clocked-highlighted PDF outputs; fail gracefully if a PDF can't be marked.
 - [ ] P04.4 Connect a case's reason to the evidence position, page, and policy version.
-- [ ] P04.5 Add PDF-specific unit/integration tests. Do not promise PDF support before it is verified.
+- [ ] P04.5 Add PDF-specific live-integrated tests. Offline preview tests (7) plus Chromium interaction checks pass; Clocked PDF-mode tests are still pending.
 
 ## P05 — Memorable judge demonstration [QUEUED]
 - [ ] P05.1 Add a second fictional scenario with a clear *gain* as well as a *loss*.

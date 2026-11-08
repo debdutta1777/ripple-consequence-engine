@@ -1,7 +1,7 @@
 /* Ripple — intentionally dependency-free judge demo. */
 'use strict';
 const $ = id => document.getElementById(id);
-const ui = {data:null, selected:null, gpa:null, income:null, filter:'all', liveReady:false};
+const ui = {data:null, selected:null, gpa:null, income:null, filter:'all', liveReady:false, uploads:{old:null,new:null}};
 const colors = {lost:'var(--red)',gained:'var(--green)',retained:'var(--purple)',excluded:'#9ca9bf',review:'var(--amber)'};
 const fmtUSD = x => x == null ? 'Unknown' : '$' + Math.round(x).toLocaleString('en-US');
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -44,13 +44,56 @@ function showFlipPath(path){
   }).join('');
   action.hidden=false;
 }
+function resetPdfState(){
+  ui.uploads={old:null,new:null};
+  for(const which of ['old','new']){
+    $(which+'-pdf').value='';
+    const status=$(which+'-upload-status');
+    status.className='pdf-upload-status';
+    status.textContent='Or paste policy text directly below. Uploading uses no Clocked credits.';
+  }
+}
+async function importPdf(which){
+  const fileInput=$(which+'-pdf'), file=fileInput.files[0];
+  if(!file)return;
+  const status=$(which+'-upload-status');
+  status.className='pdf-upload-status';
+  const fail=msg=>{status.className='pdf-upload-status error';status.textContent=msg;toast(msg);};
+  if(!file.name.toLowerCase().endsWith('.pdf') || (file.type && !['application/pdf','application/octet-stream'].includes(file.type))){
+    fail('Please choose a PDF document.');return;
+  }
+  if(file.size>2*1024*1024){fail('PDF exceeds 2 MB. Try a smaller text-based PDF.');return;}
+  status.textContent='Extracting selectable text locally on the server…';
+  try{
+    const body=new FormData();body.append('file',file);
+    const response=await fetch('/api/parse-pdf',{method:'POST',body});
+    const result=await response.json();
+    if(!response.ok)throw new Error(typeof result.detail==='string'?result.detail:`PDF upload failed (HTTP ${response.status})`);
+    // Pages are derived from the extracted text, not interpreted by an LLM.
+    if(typeof result.text!=='string' || !Array.isArray(result.pages))throw new Error('Invalid PDF extraction response.');
+    $(which+'-policy').value=result.text;
+    ui.uploads[which]={pages:result.pages,filename:file.name};
+    status.className='pdf-upload-status ready';
+    status.textContent=`✓ ${file.name} · ${result.page_count} page${result.page_count===1?'':'s'} · ${result.characters} characters. Review the text, then run Clocked analysis if enabled.`;
+    markDirty();
+    toast('PDF text loaded. No Clocked credits used. Existing demo results are unchanged until analysis.');
+  }catch(err){
+    ui.uploads[which]=null;
+    fail(err.message||'Could not extract PDF text.');
+  }finally{
+    fileInput.value='';
+  }
+}
 function jumpToEvidence(which,field){
+  if(!$('unsaved-notice').hidden){toast('These results are from the previous analysis. Run Clocked analysis before trusting evidence for edited policies.');return;}
   const phrase=ui.data?.policies?.[which]?.[field];
   const editor=$(which==='old'?'old-policy':'new-policy');
   if(!phrase){toast('No verified evidence for this clause.');return;}
   const start=editor.value.indexOf(phrase);
   if(start<0||editor.value.indexOf(phrase,start+phrase.length)>=0){toast('Unique source text not found in the editor.');return;}
   editor.focus();editor.setSelectionRange(start,start+phrase.length);editor.scrollIntoView({behavior:'smooth',block:'center'});
+  const page=ui.uploads[which]?.pages.find(p=>start>=p.start&&start<p.end);
+  if(page)toast(`Found in uploaded PDF · page ${page.page}. Text is shown in the editor; PDF highlighting is a later milestone.`);
 }
 function visibleCases(){
   const cases=ui.data?.impact?.cases||[];
@@ -166,7 +209,7 @@ function renderCase(){
   }
 }
 async function loadDemo(){
-  try{const r=await fetch('/api/demo');if(!r.ok)throw new Error('Demo server not available');setData(await r.json());}
+  try{const r=await fetch('/api/demo');if(!r.ok)throw new Error('Demo server not available');resetPdfState();setData(await r.json());}
   catch(err){toast('The demo could not load. Start the FastAPI server and refresh.');console.error(err);}
 }
 async function analyze(){
@@ -186,6 +229,7 @@ function exportReport(){
 }
 function wireEvents(){
   $('reset-demo').addEventListener('click',loadDemo);
+  for(const which of ['old','new'])$(which+'-pdf').addEventListener('change',()=>importPdf(which));
   $('theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
   document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>chooseFilter(btn.dataset.filter)));
   $('explore-flips').addEventListener('click',()=>{

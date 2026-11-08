@@ -1,48 +1,53 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 2,
+  "checkpoint_version": 3,
   "last_updated": "2026-11-09",
-  "last_completed": "UI-01",
+  "last_completed": "P04.1",
   "current_phase": "P03",
   "completed_phases": [
     "P00",
     "P01",
     "P02",
-    "UI-01"
+    "UI-01",
+    "P04.1"
   ],
   "phases": {
     "P00": "complete",
     "P01": "complete",
     "P02": "complete",
     "P03": "blocked_on_key",
-    "P04": "queued",
+    "P04": "in_progress",
     "P05": "queued",
     "P06": "queued",
     "P07": "queued",
-    "UI-01": "complete"
+    "UI-01": "complete",
+    "P04.1": "complete"
   },
   "verified": {
-    "python_tests": "20 passed on 2026-11-09",
+    "python_tests": "27 passed on 2026-11-09 (includes 7 PDF-ingest tests)",
     "javascript": "node --check web/app.js passed",
     "baseline_synthetic": true,
     "live_clocked_calls": false,
-    "browser_visual_qa": "Passed isolated Chromium (synthetic fetch stub) at 390, 768, 1024, 1280, 1440px; no horizontal overflow; no page errors",
-    "public_deployment": "User supplied https://ripple-consequence-engine.vercel.app; Vercel API project details/deployments inaccessible (404/403), deployment not verified independently",
+    "browser_visual_qa": "Isolated Chromium, synthetic API mock: light/dark toggle, decision flips, filters, PDF upload text preview, stale-result guard, responsive widths; no live Clocked calls.",
+    "public_deployment": "User verified UI-01 light redesign appeared at https://ripple-consequence-engine.vercel.app/. PDF milestone not yet confirmed deployed.",
     "clocked_cli_smoke": "scripts/smoke_clocked.py --run prepared; no key configured",
     "ui_light_default": true,
     "ui_dark_toggle": "Passed isolated Chromium + localStorage guarded, CSS transitions verified",
     "ui_filtering": "All / lost / gained / stable / review in Chromium",
     "local_http_routes": "200 for /, /assets/styles.css, /assets/app.js, /api/health, /api/demo; browser local HTTP blocked by sandbox policy",
-    "vercel_git_connection": "Project appears in Vercel project search; linked GitHub import reported by user"
+    "vercel_git_connection": "Project appears in Vercel project search; linked GitHub import reported by user",
+    "pdf_text_preview": "Validated up to 2 MB and 12 pages, local request-only parsing with pypdf; sample text PDFs served via /assets/samples/. No OCR, no Clocked request."
   },
   "blockers": [
-    "Clocked key not configured or verifiable to this session. Live Extract/Compare/Rerank have not been tested; keep P03 blocked.",
-    "Vercel get-project/list-deployments returned 404/403 for connected app. Verify automatic GitHub->Vercel deployment and /api/health through the URL after next GitHub push."
+    "P03: User still needs to configure CLOCKED_API_KEY privately in Vercel with ENABLE_LIVE=true; no paid Clocked request has been performed.",
+    "P04.2–P04.4: True Clocked PDF-mode spans and annotated PDF outputs require live API contract verification; current evidence navigation uses extracted text, not PDF highlighting.",
+    "Vercel deployment API access is limited; verify new GitHub commit redeploy through public URL or the Vercel dashboard."
   ],
   "next_actions": [
-    "Confirm Vercel auto-deployed UI-01 GitHub commit and default light/dark toggle on the live URL.",
-    "Set CLOCKED_API_KEY privately in Vercel project settings, ENABLE_LIVE=true only when ready to test with controlled budget.",
-    "Run real Clocked Extract, Compare, Rerank response-shape tests to finish P03; then P04 source/PDF evidence."
+    "Confirm that P04.1 GitHub commit reached the Vercel live site; test one sample PDF upload without using Clocked.",
+    "Configure CLOCKED_API_KEY as a Sensitive variable in Vercel. Keep ENABLE_LIVE=false until ready for controlled (four-call) live test.",
+    "Verify real Clocked extract/compare/rerank responses with fictional policy inputs and record P03 contract checks; do not mark them verified before testing.",
+    "Then implement PDF evidence page/annotation against actual Clocked SDK results."
   ],
-  "notes": "Never infer live test success from fake/mock tests. The demonstration uses only synthetic applicants and narrow GPA/income rules. UI-01 was completed out of sequence in response to user request; core P03 remains blocked, not silently completed."
+  "notes": "All 27 tests and Chromium smoke are local, offline, and do not establish real Clocked API success. PDF preview is separate from live semantic analysis and no PDF data is persisted by the app."
 }

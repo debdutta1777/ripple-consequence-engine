@@ -138,3 +138,12 @@ render.yaml            # One-click deployment blueprint
 ```
 
 Built for Clocked Build Challenge 2026. License: MIT, see LICENSE.
+
+
+## PDF text preview (P04.1, independently tested)
+
+On the Impact Studio page you can now choose **Upload previous PDF** or **Upload updated PDF**. A PDF is accepted only when it is a selectable-text PDF of at most **2 MB**, at most **12 pages**, and at most **12,000 extracted characters**. It is extracted transiently by `/api/parse-pdf`; the original PDF is not stored in the project's database, and **preview consumes zero Clocked API calls**. Scanned/image PDFs and password-protected PDFs return an explicit error (OCR is not available yet).
+
+Downloadable, wholly fictional PDF examples are provided in `web/samples/`. The extracted text is shown in the normal policy editors for human review. **Uploading a PDF does not recompute the eligibility outcomes**. If text changes, Ripple shows a stale-analysis warning and blocks evidence jumps until a new analysis is performed. That separate live action currently makes **up to four Clocked API requests** (Extract twice, Compare, Rerank) only when the server secret and `ENABLE_LIVE=true` are configured.
+
+This milestone does not yet include Clocked PDF-mode extraction, PDF annotations/highlights, or any real Clocked endpoint validation. `MAX_LIVE_ANALYSES` is a per-process safety limit, **not** a global hard budget across Vercel serverless instances; keep live analysis disabled until you are ready to monitor API usage. Never upload real student personal data to the hackathon demo.

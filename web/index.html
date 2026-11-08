@@ -65,13 +65,24 @@
           <section class="panel editor-panel" aria-labelledby="source-heading">
             <div class="section-heading"><div class="section-icon source-icon" aria-hidden="true">≡</div><div class="heading-copy"><span class="section-eyebrow">YOUR INPUT</span><h2 id="source-heading">Source policies</h2></div><span class="heading-right">01 / 04</span></div>
             <p class="panel-subtitle">Start with two versions of the same policy. The sample is fictional.</p>
+            <p class="sample-pdf-links">Try document upload: <a href="/assets/samples/previous-policy.pdf" download>2025 sample PDF ↓</a> <span aria-hidden="true">·</span> <a href="/assets/samples/updated-policy.pdf" download>2026 sample PDF ↓</a></p>
             <div class="editor-head"><div class="version-label"><span class="version-dot old"></span> PREVIOUS POLICY <span class="mini-text">2025</span></div><span class="tag-muted">ORIGINAL</span></div>
+            <div class="pdf-import">
+              <label class="pdf-import-control" for="old-pdf"><span class="pdf-import-icon" aria-hidden="true">⇧</span><span><strong>Upload previous PDF</strong><small>Text-based PDF · max 2 MB / 12 pages</small></span><span class="pdf-import-cta" aria-hidden="true">Choose file ↗</span></label>
+              <input type="file" id="old-pdf" accept=".pdf,application/pdf" aria-describedby="old-upload-status" />
+              <p id="old-upload-status" class="pdf-upload-status" role="status">Or paste policy text directly below. Uploading uses no Clocked credits.</p>
+            </div>
             <textarea id="old-policy" spellcheck="false" aria-label="Previous policy text" placeholder="Paste the original policy text..."></textarea>
             <div class="editor-head second"><div class="version-label"><span class="version-dot new"></span> UPDATED POLICY <span class="mini-text">2026</span></div><span class="tag-muted">REVISED</span></div>
+            <div class="pdf-import">
+              <label class="pdf-import-control" for="new-pdf"><span class="pdf-import-icon" aria-hidden="true">⇧</span><span><strong>Upload updated PDF</strong><small>Text-based PDF · max 2 MB / 12 pages</small></span><span class="pdf-import-cta" aria-hidden="true">Choose file ↗</span></label>
+              <input type="file" id="new-pdf" accept=".pdf,application/pdf" aria-describedby="new-upload-status" />
+              <p id="new-upload-status" class="pdf-upload-status" role="status">Or paste policy text directly below. Uploading uses no Clocked credits.</p>
+            </div>
             <textarea id="new-policy" spellcheck="false" aria-label="Current policy text" placeholder="Paste the updated policy text..."></textarea>
             <div id="unsaved-notice" class="unsaved-notice" role="status" hidden>You've edited the policy text. Results below still reflect the last completed analysis.</div>
             <div class="editor-actions"><button type="button" id="reset-demo" class="btn btn-subtle"><span aria-hidden="true">↺</span> Reset sample</button><button type="button" id="analyze-live" class="btn btn-primary">Run Clocked analysis <span aria-hidden="true">↗</span></button></div>
-            <div class="microcopy" id="live-explainer">Analyzing modified text requires a server-side Clocked API key. No uploaded personal data is needed for this sample.</div>
+            <div class="microcopy" id="live-explainer">Analyzing modified text requires a server-side Clocked API key. No uploaded personal data is needed for this sample. PDFs are parsed only after you choose a file; live analysis is a separate action.</div>
           </section>
           <section class="panel delta-panel" id="evidence" aria-labelledby="delta-heading">
             <div class="section-heading"><div class="section-icon delta-icon" aria-hidden="true">⇄</div><div class="heading-copy"><span class="section-eyebrow">WHAT CHANGED</span><h2 id="delta-heading">The policy delta</h2></div><span class="heading-right">02 / 04</span></div>

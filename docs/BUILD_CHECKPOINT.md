@@ -1,7 +1,7 @@
 # Ripple build checkpoint — update after every completed phase
 
 **Last verified:** 2026-11-09  
-**Last completed phase:** `UI-01` (out-of-sequence visual milestone; core P03 still blocked)  
+**Last completed phase:** `P04.1` (out-of-sequence PDF preview; P03 still needs secure API configuration)  
 **Current phase:** `P03` — live Clocked contract validation (blocked on secure key configuration)  
 **Suggested resume command:** `python -m pytest -q && node --check web/app.js && CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`  
 **Core status file:** `checkpoint.json`  
@@ -39,6 +39,14 @@
 - Browser checks: 390/768/1024/1280/1440 widths, dark toggle, filters, exact flip path, verbatim evidence selector, no JS page errors or horizontal overflow. Actual HTTP server route calls to `/`, `/assets/`, `/api/health`, `/api/demo` returned 200; Chromium HTTP localhost navigation blocked by environment policy, so actual HTTP browser E2E still pending.
 - User supplied production URL `https://ripple-consequence-engine.vercel.app/`. Vercel project listed through search, but project details and deployment listings returned API errors (404/403). Automatic production redeploy **not yet confirmed**.
 
+### P04.1 — PDF text ingestion + source page mapping [complete; 2026-11-09]
+- Implemented request-only `/api/parse-pdf` with `pypdf`, `python-multipart`, strict PDF signature/extension/type validation, **2 MB max file**, **12 pages max**, and **12,000 chars max**; rejects encrypted/scanned/blank/invalid PDFs with clear messages.
+- Added two version-specific upload selectors; populates policy text for manual review and exposes original per-page character offsets. Uploading uses **zero Clocked calls**. Source-evidence jumps are blocked when document edits make results stale.
+- Published two clearly fictional, downloadable sample PDF documents. The API does not persist uploaded PDFs to project storage or call Clocked in the preview step. Future PDF annotation remains separate and unverified.
+- Tests: `python -m pytest -q` **27 passed**; JS syntax check **passed**; isolated Chromium smoke **passed** including upload, dirty warning, filters, theme, and responsive widths. Generated sample PDF was visually rendered and reviewed.
+- This is a **partial P04 milestone**, not P04 completion. PDF Clocked-mode integration, annotation, and live page spans remain pending on the API key.
+- User confirmed earlier UI-01 light mode is visible on Vercel; the new PDF changes have not yet been verified on production.
+
 ## Current blockers
 
 **P03 requires a real Clocked key** in the local/server environment. The key is intentionally not accepted in chat. Follow `docs/SECURE_API_SETUP.md`. Once set, run an authenticated Extract request and examine the returned field structures before asserting the live UI works. Never include secret values in recordings or trace exports.
@@ -58,7 +66,7 @@
 
 ## Next exact steps
 
-1. Verify the GitHub UI-01 commit reaches the user-provided Vercel URL, inspect `/api/health`, and check light-mode default.
+1. Confirm the PDF upload commit redeploys from GitHub to the user-provided Vercel URL; text preview should cost no Clocked credits.
 2. Complete `P03.1` secret setup. Confirm only `/api/health` reports `live_enabled: true` (no key shown).
 3. Test `P03.2–P03.4` using the two synthetic policy texts, inspect real Clocked responses, and adjust response parser if needed.
 4. Add negative semantic checks for misleading GPA/income directions and ambiguous clauses (`P03.5`), then tests.

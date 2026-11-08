@@ -2,7 +2,7 @@
 import os
 import threading
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -10,6 +10,7 @@ from starlette.concurrency import run_in_threadpool
 from dotenv import load_dotenv
 from app.demo import make_demo, APPLICANTS
 from app.clocked_adapter import analyze_live
+from app.pdf_ingest import parse_policy_pdf, PdfInputError, MAX_PDF_BYTES
 
 ROOT = Path(__file__).resolve().parent.parent
 # Local configuration only; never serve or commit the real .env file.
@@ -43,6 +44,22 @@ def health():
 @app.get("/api/demo")
 def demo():
     return make_demo()
+
+@app.post("/api/parse-pdf")
+async def parse_pdf(file: UploadFile = File(...)):
+    """Preview selectable PDF text without using Clocked credits or storing it."""
+    try:
+        if not (file.filename or "").lower().endswith(".pdf"):
+            raise HTTPException(415, "Choose a PDF file with a .pdf extension.")
+        if file.content_type not in ("application/pdf", "application/octet-stream", None):
+            raise HTTPException(415, "Only PDF files are supported.")
+        payload = await file.read(MAX_PDF_BYTES + 1)
+        try:
+            return parse_policy_pdf(payload)
+        except PdfInputError as exc:
+            raise HTTPException(422, str(exc)) from exc
+    finally:
+        await file.close()
 
 @app.post("/api/analyze")
 async def analyze(request: Request, payload: AnalyzeRequest):

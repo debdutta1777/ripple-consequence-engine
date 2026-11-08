@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from app.demo import make_demo
+from app.pdf_ingest import parse_policy_pdf
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "fixtures" / "screenshots"
@@ -26,9 +27,11 @@ def setup(page):
     page.add_style_tag(content=CSS)
     page.evaluate("""window.fetch = async (url) => ({
         ok: true,
-        json: async () => url === '/api/demo' ? JSON.parse(window.__fixture) : {status:'ok',live_enabled:false}
+        json: async () => url === '/api/demo' ? JSON.parse(window.__fixture) :
+            url === '/api/parse-pdf' ? JSON.parse(window.__pdfFixture) : {status:'ok',live_enabled:false}
     });""")
     page.evaluate("data => window.__fixture = JSON.stringify(data)", make_demo())
+    page.evaluate("data => window.__pdfFixture = JSON.stringify(data)", parse_policy_pdf((ROOT / 'web' / 'samples' / 'previous-policy.pdf').read_bytes()))
     page.add_script_tag(content=JS)
     page.wait_for_selector("#case-matrix button")
 
@@ -53,6 +56,18 @@ def main():
         assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(14, 20, 33)"
         page.get_by_role("button", name="Switch to light mode").click()
         assert page.evaluate("document.documentElement.dataset.theme") == "light"
+        # Upload is a free preview: policy editor changes but synthetic impacts
+        # are *not* falsely recomputed, and stale source-evidence jumps are blocked.
+        page.locator('#old-pdf').set_input_files(str(ROOT / 'web' / 'samples' / 'previous-policy.pdf'))
+        page.wait_for_function("document.querySelector('#old-upload-status').classList.contains('ready')")
+        assert '1 page' in page.locator('#old-upload-status').inner_text()
+        assert 'minimum cumulative GPA of 3.2' in page.locator('#old-policy').input_value()
+        assert not page.locator('#unsaved-notice').is_hidden()
+        page.locator('[data-source="old"][data-rule="gpa_evidence"]').click()
+        assert 'previous analysis' in page.locator('#toast').inner_text()
+        page.get_by_role('button', name='Reset sample').click()
+        assert page.locator('#unsaved-notice').is_hidden()
+        assert 'Or paste policy text' in page.locator('#old-upload-status').inner_text()
         page.screenshot(path=str(OUT / 'ripple-desktop.png'), full_page=True)
         page.locator('[data-filter="lost"]').click()
         assert page.locator("#case-matrix button").count() == 4
@@ -90,7 +105,7 @@ def main():
             tablet.close()
         assert not errors, errors
         browser.close()
-    print("PASS: default light mode, dark toggle, applicant filters, 16 cases, flip interaction, evidence selection, mobile width, no JS errors.")
+    print("PASS: light/dark mode, filters, 16 cases, decision flips, evidence selection, PDF preview and stale-result safeguards, responsive layout.")
     print("NOTE: API responses were stubbed; this was not a live-server or Clocked integration test.")
 
 
