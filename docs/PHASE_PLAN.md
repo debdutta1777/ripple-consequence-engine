@@ -22,6 +22,14 @@ This plan turns the Clocked Build Challenge project into **small, individually v
 - [x] Test edges, inclusive boundaries, failures, and JavaScript syntax.
 - [ ] Browser visual/mobile QA (moved to P06).
 
+## UI-01 — Light-first UI/UX revamp [COMPLETE; out-of-sequence]
+- [x] Default to light mode regardless of system preference; add a functional dark-mode toggle with saved user preference.
+- [x] Rebuild hero, navigation, comparison, impact summary, case exploration and evidence areas in a responsive editorial system.
+- [x] Add functioning case filters, direct flip exploration, and case-level explanations.
+- [x] Warn when policy edits have not been analyzed; disable live-action affordance when key unavailable.
+- [x] Test through isolated Chromium at mobile/tablet/desktop widths; verify flip, filters and evidence.
+- [ ] Confirm these UI updates are deployed to Vercel from the connected GitHub repository.
+
 ## P03 — Verify live Clocked API integration [ACTIVE — NEEDS USER CONFIGURATION]
 - [ ] P03.1 User sets `CLOCKED_API_KEY` locally/inside deployment host, without posting it in chat.
 - [ ] P03.2 Run a small authenticated Extract request; inspect the real response field and span shapes.

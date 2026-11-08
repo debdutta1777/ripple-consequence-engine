@@ -46,8 +46,23 @@ def main():
         assert page.locator("#case-matrix button").count() == 16
         assert "lost eligibility" in page.locator("#selected-transition").inner_text().lower()
         assert "3.50" in page.locator("#flip-content").inner_text()
-        assert page.evaluate("getComputedStyle(document.documentElement).backgroundColor") == "rgb(9, 14, 23)"
-        page.screenshot(path=str(OUT / "ripple-desktop.png"), full_page=True)
+        assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(246, 247, 251)", "Light mode should be default"
+        assert page.get_by_role("button", name="Switch to dark mode").count() == 1
+        page.get_by_role("button", name="Switch to dark mode").click()
+        assert page.evaluate("document.documentElement.dataset.theme") == "dark"
+        assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(14, 20, 33)"
+        page.get_by_role("button", name="Switch to light mode").click()
+        assert page.evaluate("document.documentElement.dataset.theme") == "light"
+        page.screenshot(path=str(OUT / 'ripple-desktop.png'), full_page=True)
+        page.locator('[data-filter="lost"]').click()
+        assert page.locator("#case-matrix button").count() == 4
+        assert page.locator('[data-filter="lost"]').get_attribute("aria-pressed") == "true"
+        page.locator('[data-filter="gained"]').click()
+        assert page.locator("#case-matrix button").count() == 4
+        page.locator('[data-filter="all"]').click()
+        assert page.locator("#case-matrix button").count() == 16
+        page.get_by_role('button', name='Reset sample').click()
+        assert page.locator('#selected-case-title').inner_text() == 'Applicant 01'
         page.locator("#apply-flip").click()
         assert page.locator("#gpa-value").inner_text() == "3.50"
         assert "remains eligible" in page.locator("#selected-transition").inner_text().lower()
@@ -61,10 +76,21 @@ def main():
         mobile.on("pageerror", lambda e: errors.append(str(e)))
         setup(mobile)
         mobile.screenshot(path=str(OUT / "ripple-mobile.png"), full_page=True)
+        mobile.get_by_role("button", name="Switch to dark mode").click()
+        mobile.wait_for_timeout(300)
+        assert mobile.locator(".case-node").first.evaluate("el=>getComputedStyle(el).backgroundColor") != "rgb(239, 240, 255)"
+        assert mobile.evaluate("document.documentElement.dataset.theme") == "dark"
+        mobile.screenshot(path=str(OUT / "ripple-mobile-dark.png"), full_page=True)
+        mobile.get_by_role("button", name="Switch to light mode").click()
         assert mobile.evaluate("document.documentElement.scrollWidth") <= 390, "Mobile horizontal overflow"
+        for width in (768,1024,1280):
+            tablet=browser.new_page(viewport={"width":width,"height":900})
+            setup(tablet)
+            assert tablet.evaluate("document.documentElement.scrollWidth") <= width, f"Overflow at {width}px"
+            tablet.close()
         assert not errors, errors
         browser.close()
-    print("PASS: 16 cases, real browser flip interaction, exact evidence selection, no console errors, 390px responsive width.")
+    print("PASS: default light mode, dark toggle, applicant filters, 16 cases, flip interaction, evidence selection, mobile width, no JS errors.")
     print("NOTE: API responses were stubbed; this was not a live-server or Clocked integration test.")
 
 

@@ -1,8 +1,8 @@
 /* Ripple — intentionally dependency-free judge demo. */
 'use strict';
 const $ = id => document.getElementById(id);
-const ui = {data:null, selected:null, gpa:null, income:null};
-const colors = {lost:'#ff8d88',gained:'#ccf880',retained:'#baa5fc',excluded:'#4b6075',review:'#edcd87'};
+const ui = {data:null, selected:null, gpa:null, income:null, filter:'all', liveReady:false};
+const colors = {lost:'var(--red)',gained:'var(--green)',retained:'var(--purple)',excluded:'#9ca9bf',review:'var(--amber)'};
 const fmtUSD = x => x == null ? 'Unknown' : '$' + Math.round(x).toLocaleString('en-US');
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let toastTimer;
@@ -52,12 +52,42 @@ function jumpToEvidence(which,field){
   if(start<0||editor.value.indexOf(phrase,start+phrase.length)>=0){toast('Unique source text not found in the editor.');return;}
   editor.focus();editor.setSelectionRange(start,start+phrase.length);editor.scrollIntoView({behavior:'smooth',block:'center'});
 }
+function visibleCases(){
+  const cases=ui.data?.impact?.cases||[];
+  if(ui.filter==='all')return cases;
+  if(ui.filter==='stable')return cases.filter(c=>c.transition==='retained'||c.transition==='excluded');
+  return cases.filter(c=>c.transition===ui.filter);
+}
+function chooseFilter(filter){
+  ui.filter=filter;
+  const visible=visibleCases();
+  if(!visible.some(c=>c.id===ui.selected)){
+    ui.selected=visible[0]?.id||ui.data?.impact?.cases?.[0]?.id;
+    ui.gpa=null;ui.income=null;
+  }
+  render();
+}
+function markDirty(){
+  if(!ui.data)return;
+  const changed=$('old-policy').value!==ui.data.documents.old || $('new-policy').value!==ui.data.documents.new;
+  $('unsaved-notice').hidden=!changed;
+}
+function setTheme(theme){
+  const mode=theme==='dark'?'dark':'light';
+  document.documentElement.dataset.theme=mode;
+  const btn=$('theme-toggle');
+  btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');
+  btn.querySelector('.toggle-text').textContent=mode==='dark'?'Light mode':'Dark mode';
+  document.querySelector('meta[name="theme-color"]').content=mode==='dark'?'#0e1421':'#f6f7fb';
+  try{localStorage.setItem('ripple-theme',mode);}catch(e){/* Storage may be blocked. */}
+}
 function currentCase(){return ui.data?.impact?.cases?.find(c=>c.id===ui.selected) || ui.data?.impact?.cases?.[0];}
 function setData(data, {preserveInput=false}={}){
   ui.data=data;
   if(!preserveInput){$('old-policy').value=data.documents.old;$('new-policy').value=data.documents.new;}
   ui.selected=data.impact.cases[0]?.id;
-  ui.gpa=null;ui.income=null;
+  ui.filter='all';ui.gpa=null;ui.income=null;
+  $('unsaved-notice').hidden=true;
   render();
 }
 function render(){
@@ -65,10 +95,12 @@ function render(){
   const counts=d.impact.counts;
   $('stat-total').textContent=d.impact.total;
   ['lost','gained','review'].forEach(k=>$('stat-'+k).textContent=counts[k]||0);
-  $('mode-indicator').textContent=d.mode==='live'?'LIVE CLOCKED ANALYSIS':'SYNTHETIC DEMO';
+  $('mode-indicator').innerHTML='<span class="mode-dot"></span> '+(d.mode==='live'?'LIVE CLOCKED ANALYSIS':'SYNTHETIC DEMO');
   $('mode-indicator').classList.toggle('live',d.mode==='live');
   const pieces=['lost','gained','retained','excluded','review'].map(k=>({key:k,n:counts[k]||0}));
   $('dist-bar').innerHTML=pieces.map(p=>`<div class="dist-segment ${p.key}" style="width:${d.impact.total?p.n/d.impact.total*100:0}%" title="${p.key}: ${p.n}"></div>`).join('');
+  $('dist-bar').setAttribute('aria-label',`Outcome distribution: ${pieces.map(p=>`${p.key} ${p.n}`).join(', ')}`);
+  $('filter-total').textContent=d.impact.total;
   $('dist-legend').innerHTML=pieces.map(p=>`<span><i class="legend-dot" style="background:${colors[p.key]}"></i>${p.key.replace(/^./,c=>c.toUpperCase())}: ${p.n}</span>`).join('');
   const names=[['min_gpa','Minimum GPA',v=>v==null?'Unknown':v.toFixed(2)],['max_income','Income ceiling',fmtUSD]];
   $('delta-items').innerHTML=names.map(([key,label,format])=>{
@@ -83,11 +115,17 @@ function render(){
     const conflicts=Array.isArray(d.comparison?.conflicts)?d.comparison.conflicts.length:0;
     compared.textContent=`CLOCKED COMPARE · ${String(d.comparison?.verdict??'No verdict reported')} · ${conflicts} reported conflicts. See API trace for source details.`;
   }
-  $('case-matrix').innerHTML=d.impact.cases.map(c=>`<button class="case-node ${c.transition} ${c.id===ui.selected?'selected':''}" data-case-id="${escapeHtml(c.id)}" aria-label="${escapeHtml(c.name)}: ${escapeHtml(c.transition)}" title="${escapeHtml(c.name)} · ${escapeHtml(c.transition)}"><span class="node-dots"><i class="${c.old.status==='eligible'?'good':'bad'}"></i><span class="node-arrow">→</span><i class="${c.new.status==='eligible'?'good':'bad'}"></i></span><small>${escapeHtml(c.id)}</small></button>`).join('');
-  $('case-matrix').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ui.selected=btn.dataset.caseId;ui.gpa=null;ui.income=null;render();}));
+  document.querySelectorAll('[data-filter]').forEach(b=>{
+    const active=b.dataset.filter===ui.filter;
+    b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));
+  });
+  const words={lost:'Lost',gained:'Gained',retained:'Eligible',excluded:'Ineligible',review:'Review'};
+  const list=visibleCases();
+  $('case-matrix').innerHTML=list.length?list.map(c=>`<button class="case-node ${escapeHtml(c.transition)} ${c.id===ui.selected?'selected':''}" data-case-id="${escapeHtml(c.id)}" aria-label="${escapeHtml(c.name)}: ${escapeHtml(c.transition)}" aria-pressed="${c.id===ui.selected}"><span class="case-node-top"><span class="case-node-name">${escapeHtml(c.name)}</span><span class="case-node-index">${escapeHtml(c.id)}</span></span><span class="case-node-bottom"><span class="node-dots"><i class="${c.old.status==='eligible'?'good':c.old.status==='review'?'review':'bad'}"></i><span class="node-arrow">→</span><i class="${c.new.status==='eligible'?'good':c.new.status==='review'?'review':'bad'}"></i></span><span class="case-outcome">${words[c.transition]||'Review'}</span></span></button>`).join(''):'<p class="case-matrix-empty">No applicants in this category. Choose another filter.</p>';
+  $('case-matrix').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ui.selected=btn.dataset.caseId;ui.gpa=null;ui.income=null;render();document.getElementById('inspector').scrollIntoView({behavior:'smooth',block:'start'});}));
   renderCase();
   const calls=d.api_calls?.length?d.api_calls.join(' · '):'No Clocked calls: this is a synthetic demonstration.';
-  $('backend-disclosure').textContent=d.mode==='live'?`Verified execution path: ${calls}. Extracted rules drive deterministic decisions; missing evidence triggers review.`:`${calls} Press Analyze live to send the currently displayed policy texts to Clocked. The example is fictional and does not rely on hidden API calls.`;
+  $('backend-disclosure').textContent=d.mode==='live'?`Clocked API calls: ${calls}. Policy rules drive deterministic case decisions; missing evidence requires human review.`:`${calls} This fictional sample uses deterministic GPA/income checks. Live API analysis is a separate action and requires server-side configuration.`;
   $('trace-output').textContent=JSON.stringify({mode:d.mode,notice:d.notice,api_calls:d.api_calls,comparison:d.comparison,extraction:d.extraction,relevance:d.relevance},null,2);
 }
 function renderCase(){
@@ -106,6 +144,13 @@ function renderCase(){
   }
   const changed=ui.gpa!==null||ui.income!==null;
   $('what-if-note').textContent=changed?'Counterfactual preview (not a new Clocked API call).':'Adjust the sliders to test another scenario.';
+  const rule=ui.data.policies.new;
+  const why=[];
+  if(rule.min_gpa!=null && gpa<rule.min_gpa)why.push(`GPA ${Number(gpa).toFixed(2)} is below the updated ${Number(rule.min_gpa).toFixed(2)} minimum`);
+  if(rule.max_income!=null && income>rule.max_income)why.push(`household income ${fmtUSD(income)} is above the updated ${fmtUSD(rule.max_income)} ceiling`);
+  const explanation=trans==='review'?'The policy is missing an essential verified rule. This case cannot be decided automatically.':trans==='lost'?`This applicant loses eligibility because ${why.join(' and ')||'the new rules are more restrictive'}.`:trans==='gained'?'This applicant becomes eligible under the updated policy. Compare the changed thresholds and the source clauses below.':trans==='retained'?'This applicant satisfies the modeled requirements under both policy versions.':'This applicant does not meet the modeled requirements under either policy version.';
+  $('case-explanation').textContent=explanation+(changed?' This is an interactive what-if preview, not a new API assessment.':'');
+
   showFlipPath(flipPath(ui.data.policies.new,app));
   const evidenceOld=ui.data.policies.old, evidenceNew=ui.data.policies.new;
   $('old-evidence').textContent=`GPA: ${evidenceOld.gpa_evidence||'Not verified'}\nIncome: ${evidenceOld.income_evidence||'Not verified'}`;
@@ -129,7 +174,7 @@ async function analyze(){
   try{
     const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old_policy:$('old-policy').value,new_policy:$('new-policy').value,applicants:(ui.data?.impact?.cases||[]).map(({id,name,gpa,income})=>({id,name,gpa,income}))})});
     const obj=await r.json();if(!r.ok)throw new Error(typeof obj.detail==='string'?obj.detail:`Request failed (HTTP ${r.status})`);
-    setData(obj,{preserveInput:true});toast('Live Clocked integration completed. Inspect the API trace for evidence.');
+    setData(obj,{preserveInput:true});ui.data.documents={old:$('old-policy').value,new:$('new-policy').value};toast('Live Clocked integration completed. Inspect the API trace for evidence.');
   }catch(err){toast(err.message);}
   finally{btn.disabled=false;btn.innerHTML=original;}
 }
@@ -141,6 +186,17 @@ function exportReport(){
 }
 function wireEvents(){
   $('reset-demo').addEventListener('click',loadDemo);
+  $('theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+  document.querySelectorAll('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>chooseFilter(btn.dataset.filter)));
+  $('explore-flips').addEventListener('click',()=>{
+    if(!ui.data){toast('The sample has not loaded yet.');return;}
+    ui.filter='lost';ui.selected=ui.data.impact.cases.find(c=>c.transition==='lost')?.id||ui.data.impact.cases[0]?.id;
+    ui.gpa=null;ui.income=null;render();$('cases').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  for(const id of ['old-policy','new-policy'])$(id).addEventListener('input',markDirty);
+  document.querySelectorAll('.rail-item').forEach(link=>link.addEventListener('click',()=>{
+    document.querySelectorAll('.rail-item').forEach(item=>item.classList.toggle('active',item===link));
+  }));
   $('analyze-live').addEventListener('click',analyze);
   $('gpa-range').addEventListener('input',e=>{ui.gpa=Number(e.target.value);renderCase()});
   $('income-range').addEventListener('input',e=>{ui.income=Number(e.target.value);renderCase()});
@@ -153,12 +209,26 @@ function wireEvents(){
     renderCase();toast('Applied the minimum modeled thresholds. Review the updated decision above.');
   });
   document.querySelectorAll('[data-source][data-rule]').forEach(btn=>btn.addEventListener('click',()=>jumpToEvidence(btn.dataset.source,btn.dataset.rule)));
-  $('toggle-trace').addEventListener('click',()=>{$('trace-output').hidden=!$('trace-output').hidden;if(!$('trace-output').hidden)$('trace-output').scrollIntoView({behavior:'smooth',block:'nearest'});});
+  $('toggle-trace').addEventListener('click',()=>{const trace=$('trace-output');trace.hidden=!trace.hidden;$('toggle-trace').setAttribute('aria-expanded',String(!trace.hidden));if(!trace.hidden)trace.scrollIntoView({behavior:'smooth',block:'nearest'});});
   $('export-report').addEventListener('click',exportReport);
 }
 async function boot(){
   wireEvents();
-  try{const r=await fetch('/api/health');const h=await r.json();$('api-status').textContent=h.live_enabled?'Clocked live ready':'Demo ready · Live disabled';}catch{$('api-status').textContent='Backend unavailable';}
+  setTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
+  try{
+    const r=await fetch('/api/health');if(!r.ok)throw new Error('Health unavailable');
+    const h=await r.json();ui.liveReady=!!h.live_enabled;
+    $('api-status').textContent=h.live_enabled?'Clocked connected':'Demo ready';
+    if(!h.live_enabled){
+      $('analyze-live').disabled=true;
+      $('analyze-live').title='Enable CLOCKED_API_KEY and ENABLE_LIVE in the Vercel project to analyze custom text';
+      $('live-explainer').textContent='Live Clocked analysis needs a backend API key. The one-click synthetic demo, evidence viewer, filters and simulations are fully interactive.';
+    }
+  }catch{
+    $('api-status').textContent='Backend unavailable';
+    $('analyze-live').disabled=true;
+    $('live-explainer').textContent='Backend unavailable. Refresh when the API is running; no key is stored in the browser.';
+  }
   await loadDemo();
 }
 boot();

@@ -8,7 +8,9 @@ An evidence-first hackathon prototype for the Clocked Build Challenge. Compare t
 
 ## Features
 
-- Polished responsive single-page dashboard, no JS build step and no third-party font requirement (system fallbacks provided).
+- Light-first responsive impact dashboard with an optional persistent dark-mode toggle, no JS build step and system-font fallbacks.
+- Filterable applicant cards, a direct **Explore decision flips** journey, and plain-language explanations with source navigation.
+- Honest UX that signals when policy text has been edited but not re-analyzed, and disables paid live analysis until securely enabled.
 - One-click sample with 16 fictional applicants and two fictional policy versions.
 - Live Clocked API pathway via a backend-managed secret (`ENABLE_LIVE=true`), never embedding an API key in the browser.
 - Clocked **Extract**: reads verbatim threshold evidence from each policy.
@@ -21,7 +23,7 @@ An evidence-first hackathon prototype for the Clocked Build Challenge. Compare t
 
 ## Running locally
 
-Requires Python 3.10+ (the Clocked SDK itself supports 3.9+, but this application uses modern type annotations).
+Requires Python 3.9+.
 
 ```bash
 python -m venv .venv
@@ -49,7 +51,7 @@ $env:ENABLE_LIVE='true'
 uvicorn app.main:app --reload
 ```
 
-In the dashboard, choose **Analyze live** to process the policy texts using Clocked. `GET /api/health` exposes whether live integration is enabled, without revealing the key.
+In the dashboard, choose **Run Clocked analysis** to process the policy texts using Clocked. `GET /api/health` exposes whether live integration is enabled, without revealing the key.
 
 The SDK is pinned to `clocked-sdk==0.7.0` as documented at https://pypi.org/project/clocked-sdk/.
 
@@ -82,10 +84,21 @@ Clocked returns evidence positions and marked PDFs on supported endpoints; this 
 
 > **Live API calls have not been verified against an account in this starter** because no key has been configured. The module is written to the public SDK examples, and unit tests use mocked responses. Before submission, run with a real key, inspect the raw field shapes, and adjust extraction parsing if the live response differs.
 
-## Testing
+## Browser visual smoke test
+
+The browser test is isolated from the real API; it stubs the `/api/demo` fixture but exercises actual Chromium UI interactions (theme, filters, decision flips, evidence selection and responsive widths):
 
 ```bash
 pip install -r requirements-dev.txt
+CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke
+```
+
+`fixtures/screenshots/` contains local visual captures. Actual live Clocked verification remains a separate blocked task until a backend-only key is configured.
+
+## Testing
+
+```bash
+pip install pytest
 PYTHONPATH=. pytest -q
 ```
 
@@ -93,7 +106,7 @@ Tests cover loss and gain, inclusive boundaries, review on missing evidence, rej
 
 ## Deployment
 
-A `render.yaml` is included for deploying the *entire* site as one FastAPI web service. Deploy as a new Render web service connected to the repo. Keep the key in hosting environment settings, never in source control. To allow judges to use live analysis, set `ENABLE_LIVE=true` and `CLOCKED_API_KEY` in deployment settings. Adjust the live request budget conservatively to protect the hackathon credits. If live isn't configured, the sample remains fully usable without login.
+The site is structured for a single FastAPI deployment on Vercel (`main.py` exports the app) and retains `render.yaml` as an alternative. GitHub changes can automatically trigger Vercel deployments when the integration is correctly connected. Keep the key in hosting environment settings, never in source control. To allow judges to use live analysis, set `ENABLE_LIVE=true` and `CLOCKED_API_KEY` in deployment settings. Adjust the live request budget conservatively to protect the hackathon credits. If live isn't configured, the sample remains fully usable without login.
 
 ## Hackathon entry checklist
 
@@ -125,11 +138,3 @@ render.yaml            # One-click deployment blueprint
 ```
 
 Built for Clocked Build Challenge 2026. License: MIT, see LICENSE.
-
-## Phase checkpoints and resuming work
-
-The full implementation plan lives in [`docs/PHASE_PLAN.md`](docs/PHASE_PLAN.md). After each completed phase, update both [`checkpoint.json`](checkpoint.json) and [`docs/BUILD_CHECKPOINT.md`](docs/BUILD_CHECKPOINT.md). If a new conversation or coding agent continues the project, read [`AGENTS.md`](AGENTS.md) **first**; it explains exactly how to resume. Current status at the latest checkpoint: P00–P02 complete; P03 requires a private Clocked key.
-
-The **Decision Flip Explorer** is a deterministic, componentwise calculation of threshold requirements under the new policy, not financial, academic or eligibility advice. Click **Try these thresholds** to change the displayed synthetic what-if scenario, or use **Find GPA / Find income** to jump to the original source passage. Browser smoke-test screenshots are in `fixtures/screenshots/`.
-
-For a safe key setup, follow [`docs/SECURE_API_SETUP.md`](docs/SECURE_API_SETUP.md). To verify the real SDK after the key has been installed locally, run `python -m scripts.smoke_clocked --run` (four billable requests using fictional data). Browser-only UI smoke testing can be run with `PYTHONPATH=. python scripts/browser_smoke.py` after installing Playwright and Chromium. Its API is stubbed, so it is **not** a substitute for live integration testing.

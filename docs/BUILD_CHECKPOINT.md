@@ -1,9 +1,9 @@
 # Ripple build checkpoint — update after every completed phase
 
 **Last verified:** 2026-11-09  
-**Last completed phase:** `P02`  
+**Last completed phase:** `UI-01` (out-of-sequence visual milestone; core P03 still blocked)  
 **Current phase:** `P03` — live Clocked contract validation (blocked on secure key configuration)  
-**Suggested resume command:** `python -m pytest -q && node --check web/app.js`  
+**Suggested resume command:** `python -m pytest -q && node --check web/app.js && CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`  
 **Core status file:** `checkpoint.json`  
 **Full microphase plan:** `docs/PHASE_PLAN.md`
 
@@ -31,12 +31,13 @@
 - `python -m pytest -q`: **16 passed**; `node --check web/app.js`: **passed**.
 - Caveat: browser visual QA still pending; live API fields have only been mocked.
 
-## 2026-11-09 deployment preparation (P07 partial, NOT complete)
-- Vercel connection confirmed: Ripple project not present. Attempted project creation in the available team; received **403 Forbidden**. No project or deployment was created. Local CLI fallback is unavailable in this environment.
-- Added root `main.py` FastAPI export for Vercel framework detection.
-- Added `.vercel/` to `.gitignore` and `docs/VERCEL_DEPLOYMENT.md` with dashboard instructions, secret handling, and public-API safety caveats.
-- Full regression suite: **20 passed** (`python -m pytest -q`).
-- Next action: User creates/imports the Vercel project from a GitHub repo (or adjusts connection permissions), then sets the API key as a Sensitive server-side environment variable.
+### UI-01 — Light-first dashboard redesign [complete; 2026-11-09]
+- User requested a major interface overhaul; **light mode is now the default**, with manual dark-mode toggle and guarded local preference storage.
+- Rebuilt navigation, topbar, impact cards, policy delta, responsive outcome cards, evidence panel, simulator and a cohesive explanatory hero. No build-tool dependency was added.
+- Added outcome filters (all/lost/gained/unchanged/review), quick jump to a lost case, exact case explanation, changed-input warning, and an explicit disabled live-analysis state when a server key is not configured.
+- `python -m pytest -q`: **20 passed**; `node --check web/app.js`: **passed**; `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`: **passed** with mock API.
+- Browser checks: 390/768/1024/1280/1440 widths, dark toggle, filters, exact flip path, verbatim evidence selector, no JS page errors or horizontal overflow. Actual HTTP server route calls to `/`, `/assets/`, `/api/health`, `/api/demo` returned 200; Chromium HTTP localhost navigation blocked by environment policy, so actual HTTP browser E2E still pending.
+- User supplied production URL `https://ripple-consequence-engine.vercel.app/`. Vercel project listed through search, but project details and deployment listings returned API errors (404/403). Automatic production redeploy **not yet confirmed**.
 
 ## Current blockers
 
@@ -57,10 +58,11 @@
 
 ## Next exact steps
 
-1. Complete `P03.1` secret setup. Confirm only `/api/health` reports `live_enabled: true` (no key shown).
-2. Test `P03.2–P03.4` using the two synthetic policy texts, inspect real Clocked responses, and adjust response parser if needed.
-3. Add negative semantic checks for misleading GPA/income directions and ambiguous clauses (`P03.5`), then tests.
-4. Capture desktop and mobile visual evidence for the new flip path (`P06.3`) when practical.
+1. Verify the GitHub UI-01 commit reaches the user-provided Vercel URL, inspect `/api/health`, and check light-mode default.
+2. Complete `P03.1` secret setup. Confirm only `/api/health` reports `live_enabled: true` (no key shown).
+3. Test `P03.2–P03.4` using the two synthetic policy texts, inspect real Clocked responses, and adjust response parser if needed.
+4. Add negative semantic checks for misleading GPA/income directions and ambiguous clauses (`P03.5`), then tests.
+5. Capture desktop and mobile visual evidence for the new flip path (`P06.3`) when practical.
 
 ## Checkpoint maintenance protocol
 
