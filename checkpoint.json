@@ -1,9 +1,9 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 16,
+  "checkpoint_version": 17,
   "last_updated": "2026-11-10",
-  "last_completed": "TRY-02_restored_landing_and_direct_upload_entry",
-  "current_phase": "P07_submission_pending_live_general_policy_support_scope_limited",
+  "last_completed": "TRY-03_live_auth_and_new_PDF_qa",
+  "current_phase": "P07_official_submission_receipt_pending",
   "completed_phases": [
     "P00",
     "P01",
@@ -20,7 +20,8 @@
     "P03.2",
     "P04.3",
     "TRY-01",
-    "TRY-02"
+    "TRY-02",
+    "TRY-03"
   ],
   "phases": {
     "P00": "complete",
@@ -34,7 +35,8 @@
     "P07": "audit_release_deployed_submission_unconfirmed",
     "LP-01": "complete_deployed",
     "TRY-01": "complete_offline_public_uploaded_pdf_and_cohort_workflow",
-    "TRY-02": "complete_and_deployed"
+    "TRY-02": "complete_and_deployed",
+    "TRY-03": "complete: public PDF upload and deterministic results + authenticated Clocked text suite verified; native highlights unavailable on newly formatted pair"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -95,16 +97,64 @@
     "try02_routing": "PASS: original Ripple landing retained; Explore Demo -> /studio, Try It Yourself -> /try. /try begins at Upload your policy versions and includes sample loader inside uploader.",
     "try02_tests": "50 pytest passed, landing and try Chromium smoke passed (desktop/mobile, PDF upload and outcome inspection), GitHub CI run 42705636893 succeeded.",
     "try02_production": "Vercel production deployment dpl_EJRingLSsyEbnGUutD6ha1UUqpr2 READY and public alias confirmed. GET /, /try, /studio returned 200; verified hero actions and upload-first DOM.",
-    "try02_commit": "ec70587c9f1c74abfb56c65d2d20e6b1a3665015"
+    "try02_commit": "ec70587c9f1c74abfb56c65d2d20e6b1a3665015",
+    "try03_ui": {
+      "animations": "real-stage scan progress, staggered cards and charts, reduced-motion support",
+      "assets": "new 2025 and 2026 PDFs available publicly",
+      "source": "user video reviewed; UI notes in docs/VIDEO_UI_REVIEW.md",
+      "qa": "53 backend tests, Chromium mobile/desktop PDF upload, CSV, chart, export, theme, screen-size 390–1440px"
+    },
+    "try03_public_api": {
+      "status": "PASS",
+      "workflow": "https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42713532903",
+      "requests": "POST /api/parse-pdf twice and /api/preview once",
+      "expected_rules": [
+        3.25,
+        52000,
+        3.65,
+        66000
+      ],
+      "fictional_cohort": {
+        "lost": 4,
+        "gained": 2,
+        "retained": 2,
+        "excluded": 8,
+        "review": 0
+      },
+      "mode": "offline deterministic (0 Clocked credits)"
+    },
+    "try03_real_clocked": {
+      "status": "PASS authenticated Extract x2, Compare x1, Rerank x1 on the same freshly uploaded policy text",
+      "comparison_verdict": "conflicts",
+      "rerank_items": 4,
+      "sdk_credits_text": 16,
+      "workflow": "https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42713532903",
+      "api_key": "Actions secret; not exposed"
+    },
+    "try03_fresh_pdf_markup": {
+      "status": "NOT PRODUCED for new formatted PDFs",
+      "request": "one real authenticated Compare PDF with highlight",
+      "comparison_verdict": "conflicts",
+      "sdk_credits_pdf": 3,
+      "marked_spans": 0,
+      "remark": "Earlier native PDF highlighting on simple source fixture verified separately (P04.3). Do not generalize that success."
+    },
+    "try03_final_run_credits": 19,
+    "try03_proof_artifact": {
+      "artifact_id": 13716113325,
+      "expires": "2026-11-16",
+      "source": "github workflow actions 42713532903"
+    }
   },
   "blockers": [
-    "Public /try supports only simple scholarship GPA and USD income rules and literal line changes; arbitrary custom policies can require review. It is not a universal compliance engine.",
-    "Real Clocked API operations validated separately with fictional fixtures, not yet wired as public uploaded-PDF processing.",
-    "Official hackathon submission is not confirmed."
+    "External hackathon submission/official receipt not confirmed. Deadline 2026-11-10 23:59 Eastern / 2026-11-11 10:29 IST.",
+    "Public /try still intentionally performs deterministic parsing and GPA/income outcome evaluation. Real Clocked confirmation is out-of-band.",
+    "Native highlights were verified on simple original PDFs but are absent for newly styled PDF fixtures where Clocked returned zero spans; cannot promise marks on arbitrary documents."
   ],
   "next_actions": [
-    "Finalize hackathon submission with latest public landing page, /studio fictional demo, and /try upload workflow; retain submission receipt.",
-    "Only if needed, extend public /try beyond transparent deterministic GPA/income rules with quota-backed Clocked processing; do not claim unsupported general-policy semantic coverage."
+    "Immediately submit Ripple to the official Clocked challenge with https://ripple-consequence-engine.vercel.app/, public GitHub repository, screenshots/video and proof links; retain submission confirmation.",
+    "Optional post-submission: add safe distributed quota-backed public Clocked analysis on uploaded documents; do not enable unrestricted anonymous paid routes.",
+    "If more sample data is needed, use anonymized synthetic inputs and keep unsupported policy clauses flagged as review."
   ],
   "notes": "P03.2 verified real text Extract x2, Compare x1, Rerank x1 (24 credits); P04.3 verified real SDK-native Compare PDF highlighted output (9 credits). Five authenticated calls used 33 SDK-reported credits. Both workflows are manually runnable; no secrets committed. TRY-01 delivered public two-PDF upload UI with optional applicant cohort CSV; no user authentication or paid calls. UI inspiration derived from user-supplied AuditEase screenshots; branding and layout are Ripple-specific."
 }
