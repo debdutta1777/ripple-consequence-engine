@@ -1,8 +1,8 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 9,
+  "checkpoint_version": 10,
   "last_updated": "2026-11-09",
-  "last_completed": "LP-01_local_qa",
+  "last_completed": "LP-01_production_ready",
   "current_phase": "P03.2_authenticated_clocked_validation",
   "completed_phases": [
     "P00",
@@ -28,7 +28,7 @@
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
     "P07": "audit_release_deployed_submission_unconfirmed",
-    "LP-01": "complete_local_ready_for_deployment"
+    "LP-01": "complete_deployed"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -52,8 +52,11 @@
     "production_deployment_prior": "Audit release commit 469d3037f1271afead81f59ec0827ef6fcc994fb READY Production and stable ripple-consequence-engine.vercel.app alias confirmed by Vercel deployment metadata. Direct production HTTP access through Vercel connector was denied.",
     "production_http_access": "Vercel web fetch denied by connector permissions; sandbox networking cannot resolve domain. Production HTTP routes not directly verified.",
     "landing_local_qa": "Passed Chromium TestClient actual /api/demo interaction, 390/768/1024/1280/1440 widths, theme persistence toggles, no JS errors",
-    "landing_public_route": "GET / landing and GET /studio workspace implemented locally; production deploy pending",
-    "real_clocked_auth": "NOT VERIFIED: restricted Vercel admin invocation and Sandbox (403)"
+    "landing_public_route": "GitHub 1167550c47b6aa67332e9afe12e531023b82e421 Vercel deployment dpl_3LSXd6wkBCKeL7oZMgUn2YWGNKXX READY production with stable alias ripple-consequence-engine.vercel.app. Direct HTTP response not independently fetched.",
+    "real_clocked_auth": "NOT VERIFIED: restricted Vercel admin invocation and Sandbox (403)",
+    "landing_public_url": "https://ripple-consequence-engine.vercel.app/",
+    "studio_public_url": "https://ripple-consequence-engine.vercel.app/studio",
+    "actual_clocked_request": "Not performed: Vercel sandbox creation returns 403; protected HTTP access unavailable."
   },
   "blockers": [
     "Authenticated Clocked call not yet completed. Key exists as Sensitive in Vercel, but temporary Sandbox creation returned 403 and protected HTTP route cannot be invoked via this Vercel connection. Team authorization may need re-approval; do not bypass access by exposing a paid endpoint.",
@@ -62,10 +65,9 @@
     "External hackathon submission/receipt not confirmed."
   ],
   "next_actions": [
-    "Deploy landing page release and confirm Vercel READY with production alias.",
-    "Complete Vercel team-access approval and use a private short-lived verifier request to test actual Clocked Extract x2, Compare x1, Rerank x1; do not expose key or make paid endpoint public.",
-    "If verified, record sanitized SDK response shapes/usage and run native PDF evidence check.",
-    "Submit official challenge entry and retain receipt."
+    "Owner approves temporary Vercel team connection access; then retry controlled private runner and single Clocked verification with synthetic data.",
+    "Upon verified authenticated SDK response, update integration results and test PDF annotated evidence.",
+    "Submit final hackathon entry and retain receipt."
   ],
   "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
 }

@@ -142,3 +142,9 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Repointed offline Chromium and demo recording to `web/studio.html`; added `scripts/landing_smoke.py` and assertions in route tests.
 - Re-ran unit suite and browser checks (see release receipt). No real Clocked request was made in these tests.
 - Vercel sandbox-backed secure HTTP verification was attempted but failed with **403 forbidden** to create sandbox; an alternative authorized invocation channel remains necessary to call protected Clocked endpoint. The Sensitive Production key exists but was not decrypted or copied.
+
+### LP-01 deployment receipt [verified 2026-11-09]
+- GitHub landing release commit: `1167550c47b6aa67332e9afe12e531023b82e421`.
+- Vercel Production deployment `dpl_3LSXd6wkBCKeL7oZMgUn2YWGNKXX` reported **READY** with alias `ripple-consequence-engine.vercel.app`.
+- The studio is now `GET /studio`; synthetic preview is available on `GET /`. These routes passed local FastAPI and Chromium checks; hosted HTTP fetch access to protected Vercel environment remains restricted.
+- Authenticated Clocked still **not verified**. Attempted private Sandbox runner returned 403. No real Clocked calls used.
