@@ -6,6 +6,11 @@
 
 A **consequence-first** experiment for the 2026 Clocked Build Challenge. Ripple compares two fictional scholarship policies and shows how a rule edit changes decisions for a synthetic cohort. Unlike a text-only diff, it makes those changes inspectable as interactive paths, testable what-ifs, and traceable evidence. **The app defaults to light mode**, with optional dark mode.
 
+
+## Try It Yourself — upload your own PDFs
+
+Open **[ripple-consequence-engine.vercel.app/try](https://ripple-consequence-engine.vercel.app/try)** to upload a previous and updated text-based policy PDF (2 MB / 12 pages each), optionally provide up to 100 applicant profiles via CSV, and view the recalculated impact dashboard with source evidence, charts, clause changes, filters, and CSV export. The 16 fictional applicants are clearly labeled when no CSV is supplied. Complex rules are marked **Needs review** rather than producing false eligibility. This public workflow uses temporary parsing and deterministic previews, **not paid Clocked calls**. See [`docs/TRY_IT_YOURSELF.md`](docs/TRY_IT_YOURSELF.md) for scope and limitations.
+
 ## What you can try without an account or credits
 
 - **Consequence Map:** Every connecting line is an applicant's old-to-new outcome. Select a path to investigate the case.

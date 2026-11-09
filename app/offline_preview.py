@@ -8,6 +8,7 @@ import re
 from app.rules import Policy, impact
 from app.clocked_adapter import _number_exact, _supported_direction
 from app.demo import APPLICANTS
+from app.policy_diff import compare_policy_text
 
 # Deliberately conservative: additional conditions invalidate an automatic
 # eligibility conclusion, rather than being silently ignored.
@@ -75,6 +76,7 @@ def preview_policies(before: str, after: str, people=None) -> dict:
         "mode": "offline",
         "notice": "Credit-free local heuristic preview ONLY. This is not Clocked analysis or an official eligibility decision. Only one unambiguous minimum GPA and one USD annual income ceiling per policy are supported. All other conditions require review.",
         "documents": {"old": before, "new": after},
+        "document_diff": compare_policy_text(before, after),
         "policies": {"old": prev.as_dict(), "new": curr.as_dict()},
         "comparison": {"verdict": "Local rule preview — not Clocked", "conflicts": [], "raw": None},
         "impact": impact(prev, curr, persons),

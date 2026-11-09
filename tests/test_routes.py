@@ -28,6 +28,7 @@ def test_root_and_assets_served():
     assert landing.status_code == 200
     assert 'A single rule can' in landing.text
     assert 'href="/studio"' in landing.text
+    assert 'href="/try"' in landing.text
     studio = client.get('/studio')
     assert studio.status_code == 200
     assert 'Decision flips' in studio.text

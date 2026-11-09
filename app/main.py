@@ -43,7 +43,7 @@ class Applicant(BaseModel):
 class AnalyzeRequest(BaseModel):
     old_policy: str = Field(min_length=1, max_length=12_000)
     new_policy: str = Field(min_length=1, max_length=12_000)
-    applicants: list[Applicant] = Field(default_factory=list, max_length=30)
+    applicants: list[Applicant] = Field(default_factory=list, max_length=100)
 
 _lock = threading.Lock()
 _usage = {"total": 0}
@@ -68,6 +68,10 @@ def index():
 @app.get("/studio")
 def studio():
     return FileResponse(ROOT / "web" / "studio.html")
+
+@app.get("/try")
+def try_it():
+    return FileResponse(ROOT / "web" / "try.html")
 
 @app.get("/api/health")
 def health():

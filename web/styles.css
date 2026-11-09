@@ -133,3 +133,7 @@ button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity
 .lab-presets button{background:var(--surface);color:var(--accent-strong);border:1px solid var(--border-strong);border-radius:100px;padding:8px 11px;font-size:10px;font-weight:700;transition:background .15s,transform .15s}
 .lab-presets button:hover{background:var(--surface-alt);transform:translateY(-1px)}
 @media(max-width:600px){.lab-presets>span{width:100%}}
+
+.try-topbar{text-decoration:none;display:inline-flex;align-items:center}
+@media(min-width:761px) and (max-width:1000px){.try-topbar{display:none}}
+@media(max-width:760px){.try-topbar{font-size:0;padding:8px 10px}.try-topbar::after{content:"⇧ Try";font-size:10px}}
