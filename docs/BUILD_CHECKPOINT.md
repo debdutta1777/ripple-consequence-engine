@@ -159,3 +159,15 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Corrected truncated `actions/checkout` pins on the main CI and manual Clocked workflows. Hosted GitHub CI succeeded after the change.
 - This completion covers *text-based* Extract/Compare/Rerank only. **Native PDF marked highlighting and arbitrary real policy rules remain unverified.** The public website still intentionally runs the credit-free deterministic preview.
 - Next: separately test Clocked's real annotated PDF response; confirm external hackathon submission receipt.
+
+
+### P04.3 — Real Clocked native PDF highlighting [VERIFIED; 2026-11-10]
+- Executed ONE authenticated SDK Compare operation with two bundled fictional scholarship-policy PDFs, using `return_pdf="highlight"`.
+- [GitHub Actions run 42695749607](https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42695749607), job `129427019985`, succeeded.
+- Clocked returned `verdict=conflicts` and **1** conflict. SDK reported **9 credits**.
+- Downloaded the real marked-PDF artifact and independently verified both PDFs with `pypdf`: one /Highlight annotation in the previous policy PDF and four /Highlight annotations in the current policy PDF. Visually rendered the files; annotations appear over the policy text.
+- Proof artifact `ripple-real-clocked-pdf-proof` (ID `13707534934`), retention through 2026-11-16, contains original Clocked-marked PDFs and a sanitized JSON manifest. No secrets.
+- Retained verification script `scripts/verify_clocked_pdf.py` and a **manual-only** workflow `.github/workflows/verify-clocked-pdf.yml` on main; normal commits do not execute billable tests.
+- Combined authenticated requests across the text and PDF smoke tests: **5 requests, 33 SDK-reported credits**.
+- This verifies **native PDF output for fictional text-based PDFs only**. It does not enable public live analysis, support scanned PDFs, or prove arbitrary uploaded policies are interpreted correctly.
+- Primary remaining non-code task: **submit Ripple to the hackathon and retain the official receipt**.
