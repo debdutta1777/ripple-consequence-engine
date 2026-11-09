@@ -1,16 +1,19 @@
 """Ripple app: one-service deployment, no frontend build step."""
 import os
 import threading
+import hmac
+import time
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 from dotenv import load_dotenv
-from app.demo import make_demo, APPLICANTS
+from app.demo import make_demo, APPLICANTS, OLD_TEXT, NEW_TEXT
 from app.clocked_adapter import analyze_live
 from app.pdf_ingest import parse_policy_pdf, PdfInputError, MAX_PDF_BYTES
+from app.clocked_pdf import create_marked_comparison
 
 ROOT = Path(__file__).resolve().parent.parent
 # Local configuration only; never serve or commit the real .env file.
@@ -18,6 +21,17 @@ ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env", override=False)
 app = FastAPI(title="Ripple Consequence Engine", version="0.1.0")
 app.mount("/assets", StaticFiles(directory=ROOT / "web"), name="assets")
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["X-Frame-Options"] = "DENY"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 class Applicant(BaseModel):
     id: str = Field(min_length=1, max_length=40)
@@ -51,7 +65,7 @@ def index():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "live_enabled": live_ready()}
+    return {"status": "ok", "live_enabled": False, "demo_only": True, "version": "0.9.0"}
 
 @app.get("/api/demo")
 def demo():
@@ -73,8 +87,100 @@ async def parse_pdf(file: UploadFile = File(...)):
     finally:
         await file.close()
 
-@app.post("/api/analyze")
+def require_verifier(request: Request) -> None:
+    """Private admin-only verification gate; never enable for public visitors.
+
+    Clocked API credits are protected by a secret and a short, explicit window.
+    This is *not* a persistent global rate limiter. Only fictional sample data
+    can be sent from this route, so no user-supplied private policy is exposed.
+    """
+    key = os.getenv("RIPPLE_VERIFY_TOKEN", "")
+    supplied = request.headers.get("x-ripple-verify", "")
+    try:
+        expires = int(os.getenv("RIPPLE_VERIFY_UNTIL", "0"))
+    except ValueError:
+        expires = 0
+    if (
+        os.getenv("ENABLE_VERIFICATION") != "true"
+        or not key or len(key) < 32
+        or not supplied or not hmac.compare_digest(key, supplied)
+        or expires <= int(time.time())
+    ):
+        raise HTTPException(404, "Not found")
+
+
+@app.post("/api/internal/verify-clocked", include_in_schema=False)
+async def verify_clocked(request: Request):
+    """Runs four billed requests only with a temporary, private verifier key.
+
+    The administrator must explicitly enable the short verification window in
+    Vercel. After inspecting the sanitized results, disable the flag. This
+    endpoint is never reachable with the public website alone.
+    """
+    require_verifier(request)
+    try:
+        from clocked_sdk import Clocked
+        def run():
+            with Clocked(timeout=90, max_attempts=1) as client:
+                return analyze_live(client, OLD_TEXT, NEW_TEXT, APPLICANTS)
+        result = await run_in_threadpool(run)
+        policies = result["policies"]
+        matched = (
+            policies["old"].get("min_gpa") == 3.2
+            and policies["old"].get("max_income") == 50000
+            and policies["new"].get("min_gpa") == 3.5
+            and policies["new"].get("max_income") == 60000
+        )
+        return {
+            "status": "verified" if matched else "needs_review",
+            "mode": "live",
+            "endpoint_calls": result["api_calls"],
+            "extracted_policies": {
+                label: {"min_gpa": data["min_gpa"], "max_income": data["max_income"]}
+                for label, data in policies.items()
+            },
+            "comparison_verdict": result["comparison"].get("verdict"),
+            "comparison_conflicts": len(result["comparison"].get("conflicts", [])),
+            "reranked_items": len(result.get("relevance", [])),
+            "cohort_counts": result["impact"]["counts"],
+            "usage": result["usage"],
+            "disclaimer": "This verifies only the two fictional, explicit GPA/income policies; custom PDF interpretation remains unverified.",
+        }
+    except Exception as exc:
+        # No upstream responses, credentials, or exception text leave this route.
+        raise HTTPException(502, "Clocked verification failed. Examine secure server logs without revealing secrets.") from exc
+
+
+@app.post("/api/internal/pdf-proof", include_in_schema=False)
+async def verified_pdf_proof(request: Request):
+    """One extra billed Compare request; restricted to static fictional PDFs."""
+    require_verifier(request)
+    try:
+        from clocked_sdk import Clocked
+        previous = (ROOT / "web" / "samples" / "previous-policy.pdf").read_bytes()
+        updated = (ROOT / "web" / "samples" / "updated-policy.pdf").read_bytes()
+        def run():
+            with Clocked(timeout=90, max_attempts=1) as client:
+                return create_marked_comparison(client, previous, updated)
+        bundle, manifest = await run_in_threadpool(run)
+        return Response(
+            bundle,
+            media_type="application/zip",
+            headers={
+                "Cache-Control": "no-store",
+                "Content-Disposition": 'attachment; filename="ripple-clocked-pdf-proof.zip"',
+                "X-Ripple-Marked-Count": str(sum(int(x["highlighted"]) for x in manifest["documents"].values())),
+            },
+        )
+    except Exception as exc:
+        raise HTTPException(502, "Could not create a Clocked PDF comparison pack. No unverified annotations were generated.") from exc
+
+
+@app.post("/api/analyze", include_in_schema=False)
 async def analyze(request: Request, payload: AnalyzeRequest):
+    # No public paid endpoint without persistent global quota infrastructure.
+    # Authenticated administrative calls are possible only in a short window.
+    require_verifier(request)
     if not live_ready():
         raise HTTPException(503, "Live analysis is locked. The administrator must configure an API key, explicitly enable live mode, and set a positive analysis budget. The synthetic demo remains available.")
     with _lock:

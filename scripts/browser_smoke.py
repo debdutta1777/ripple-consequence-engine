@@ -43,10 +43,43 @@ def main():
         if os.getenv("CHROMIUM_PATH"):
             opts["executable_path"] = os.environ["CHROMIUM_PATH"]
         browser = p.chromium.launch(**opts)
-        page = browser.new_page(viewport={"width": 1440, "height": 900}, device_scale_factor=1)
+        page = browser.new_page(viewport={"width": 1440, "height": 900}, device_scale_factor=1, accept_downloads=True)
         page.on("pageerror", lambda e: errors.append(str(e)))
         setup(page)
         assert page.locator("#case-matrix button").count() == 16
+        assert page.locator('#consequence-flow .flow-case').count() == 16
+        assert page.locator('#flow-label').inner_text() == 'BASELINE'
+        # Rule Lab recalculates the entire fictional cohort without API calls.
+        page.locator('#rule-gpa').evaluate("el => {el.value='3.8';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+        assert page.locator('#rule-gpa-value').inner_text() == '3.80'
+        assert page.locator('#flow-label').inner_text() == 'HYPOTHETICAL'
+        assert page.locator('#consequence-flow .flow-case').count() == 16
+        assert page.locator('#lab-impact').inner_text().find('Hypothetical outcome') >= 0
+        page.locator('#reset-rules').click()
+        assert page.locator('#flow-label').inner_text() == 'BASELINE'
+        assert page.locator('#stat-lost').inner_text() == '4'
+        page.locator('#preset-tighten').click()
+        assert page.locator('#rule-gpa-value').inner_text() == '3.85'
+        assert page.locator('#rule-income-value').inner_text() == '$40,000'
+        assert page.locator('#flow-label').inner_text() == 'HYPOTHETICAL'
+        page.locator('#preset-expand').click()
+        assert page.locator('#rule-gpa-value').inner_text() == '3.00'
+        page.locator('#reset-rules').click()
+        assert page.locator('#flow-label').inner_text() == 'BASELINE'
+        # Interactive SVG paths must select the same applicant as the case cards.
+        page.locator('#consequence-flow .flow-case[data-case-id="A04"]').click()
+        assert page.locator('#selected-case-title').inner_text() == 'Applicant 04'
+        page.locator('#consequence-flow .flow-case[data-case-id="A01"]').focus()
+        page.keyboard.press('Enter')
+        assert page.locator('#selected-case-title').inner_text() == 'Applicant 01'
+        # The guided tour provides a quick-start explanation without consuming API credits.
+        page.locator('#tour-start').click()
+        assert not page.locator('#tour-shade').is_hidden()
+        assert '01 / 04' in page.locator('#tour-progress').inner_text()
+        page.locator('#tour-next').click()
+        assert '02 / 04' in page.locator('#tour-progress').inner_text()
+        page.keyboard.press('Escape')
+        assert page.locator('#tour-shade').is_hidden()
         assert "lost eligibility" in page.locator("#selected-transition").inner_text().lower()
         assert "3.50" in page.locator("#flip-content").inner_text()
         assert page.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(246, 247, 251)", "Light mode should be default"
@@ -86,6 +119,19 @@ def main():
             "el => el.value.substring(el.selectionStart, el.selectionEnd)"
         )
         assert "minimum cumulative GPA of 3.5" in highlighted
+        assert 'minimum cumulative GPA of 3.5' in page.locator('#lens-excerpt mark').inner_text()
+        assert 'UPDATED' in page.locator('#lens-meta').inner_text()
+        with page.expect_download() as download_info:
+            page.locator('#export-case').click()
+        download = download_info.value
+        assert download.suggested_filename == 'ripple-A01-proof.html'
+        artifact = OUT / 'ripple-case-proof.html'
+        download.save_as(str(artifact))
+        proof = artifact.read_text(encoding='utf-8')
+        assert 'Traceable source clauses' in proof
+        assert 'minimum cumulative GPA of 3.5' in proof
+        assert 'Clocked API key' not in proof
+        artifact.unlink()
         page.screenshot(path=str(OUT / "ripple-evidence-jump.png"), full_page=True)
         mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
         mobile.on("pageerror", lambda e: errors.append(str(e)))

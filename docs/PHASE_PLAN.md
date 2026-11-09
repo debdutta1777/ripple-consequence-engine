@@ -1,75 +1,37 @@
-# Ripple — microphase implementation plan
+# Ripple — phase-by-phase build roadmap
 
-This plan turns the Clocked Build Challenge project into **small, individually verifiable checkpoints**. The detailed status of each phase is in `checkpoint.json` and `docs/BUILD_CHECKPOINT.md`. Never mark a phase complete without a verified artifact or passing check.
+One checkpoint per completed phase; code and status must be committed together. All results must be marked accurately as **offline mock**, **real backend route**, or **real Clocked API**.
 
-## P00 — Baseline audit [COMPLETE]
-- [x] Locate starter files and inspect backend, frontend, fixtures, and tests.
-- [x] Confirm the known synthetic demo and four Clocked SDK call sites (Extract twice, Compare once, Rerank once).
-- [x] Run baseline suite: 12 passed. Identify the live-key dependency.
+| Phase | Name | State | Acceptance evidence |
+|---|---|---|---|
+| P00 | Starter audit | Complete | Reused synthetic data and found project gaps |
+| P01 | Project checkpoints + secret safety | Complete | `checkpoint.json`, human logs, safe environment setup |
+| P02 | Decision Flip Explorer | Complete | Exact two-rule counterfactual, evidence buttons, unit tests |
+| UI-01 | Light-first redesign | Complete | User confirmed Vercel site; saved dark-mode toggle, responsive tests |
+| P03.1 | Secure Clocked secret metadata | Complete | Sensitive Production key confirmed without decryption |
+| P03.1b | Credit safety + telemetry | Complete | Public paid route gated; credits only from SDK metadata |
+| P03.2 | Protected Clocked smoke | Pending real API run | Four authenticated SDK responses, sanitized output, no secrets |
+| P03.3 | Live contract remediation | Pending smoke | Real field shapes, verdict, rerank scores, billing trace |
+| P04.1 | PDF text extraction | Complete | 2MB/12page/12k limits, mock UI + error tests |
+| P04.2 | PDF source lens | Complete (offline) | Local page offsets, original PDF navigation, highlighted exact text |
+| P04.3 | Clocked PDF annotation code | Implemented, mock-tested | Protected optional `return_pdf="highlight"` flow; genuine marked file requires live test |
+| P05.1 | Consequence Map | Complete | Interactive, accessible SVG lines based on deterministic outcomes |
+| P05.2 | Policy Rule Lab | Complete | Instant whole-cohort recalculation, no Clocked calls, two presets |
+| P05.3 | Guided judge tour | Complete | Four-step tour and browser checks |
+| P05.4 | Proof card / JSON export | Complete | Standalone case HTML and evidence JSON, provenance disclaimer |
+| P06.1 | Automated tests | Complete offline | 37 pytest tests, Node check, Chromium smoke across five widths |
+| P06.2 | Secure public mode | Complete prototype | No public paid calls, expiring admin verifier, safe response headers |
+| P06.3 | Real network and live QA | Pending real deployment confirmation | Actual deployed site, PDF flow, authenticated Clocked output |
+| P07.1 | Public repository | Complete | GitHub history with roadmap/checkpoints |
+| P07.2 | Production deployment | User-confirmed previous build | Latest commit's Ready production state needs verification |
+| P07.3 | Submission docs and demo | Complete docs; video pending | `docs/SUBMISSION.md` and `docs/JUDGE_DEMO.md` |
+| P07.4 | Submit to organizer | User action pending | Submission receipt/link; do not claim submission before confirmed |
 
-## P01 — Project management and secret-safe setup [COMPLETE]
-- [x] Create persistent phase plan, human checkpoint, machine checkpoint, and `AGENTS.md` resume protocol.
-- [x] Add backend-only `.env` support without overriding host environment variables.
-- [x] Ignore local `.env*` files except `.env.example`, avoid committing credentials.
-- [x] Document secure local/hosting configuration.
-- [x] Retest backend after configuration changes.
+## Exact next steps after this release
 
-## P02 — Decision Flip Explorer [COMPLETE]
-- [x] Implement a deterministic *componentwise threshold* path for the current policy.
-- [x] Handle zero, one, two, or unknown failing conditions without fabricated recommendations.
-- [x] Add a visible flip panel and an **Apply thresholds** interaction.
-- [x] Link verbatim evidence to specific locations in the policy editor (text mode).
-- [x] Test edges, inclusive boundaries, failures, and JavaScript syntax.
-- [ ] Browser visual/mobile QA (moved to P06).
+1. Push and verify release commit, run GitHub Actions check, verify Vercel Production Ready, and confirm `/api/health` and `/api/demo` on the public URL. If tools cannot read runtime routes, record that limitation.
+2. Attempt one controlled real Clocked smoke only with a short-lived secret-based verifier and narrow fictional inputs. Stop after success or a clear blocker; do not run repeated paid retries.
+3. If real Clocked proof exists, save sanitized evidence and exact usage in `docs/VERIFICATION_RESULTS.md`. If no real call was possible, leave the status unverified.
+4. Verify a demo video or publish a narration script, then complete the external challenge submission form and check confirmation.
 
-## UI-01 — Light-first UI/UX revamp [COMPLETE; out-of-sequence]
-- [x] Default to light mode regardless of system preference; add a functional dark-mode toggle with saved user preference.
-- [x] Rebuild hero, navigation, comparison, impact summary, case exploration and evidence areas in a responsive editorial system.
-- [x] Add functioning case filters, direct flip exploration, and case-level explanations.
-- [x] Warn when policy edits have not been analyzed; disable live-action affordance when key unavailable.
-- [x] Test through isolated Chromium at mobile/tablet/desktop widths; verify flip, filters and evidence.
-- [x] User confirmed UI-01 light-mode redesign appeared on their Vercel URL. (2026-11-09)
-
-## P03 — Verify live Clocked API integration [ACTIVE — KEY METADATA VERIFIED; CONTROLLED TEST PENDING]
-- [x] P03.1 User saved `CLOCKED_API_KEY` as a Sensitive Production variable in Vercel; confirmed key metadata through the authenticated Vercel connection without decrypting or reading its value (2026-11-09).
-- [ ] P03.2 Run a small authenticated Extract request; inspect the real response field and span shapes.
-- [ ] P03.3 Compare the fictional old/new policies with the real Compare endpoint.
-- [ ] P03.4 Verify Rerank IDs, scores, and response shape; display the trace honestly.
-- [ ] P03.5 Harden parser for actual live responses, semantic direction, ambiguous clauses, and failure handling. (Directional checks and unit tests done; live shape/error checks outstanding.)
-- [ ] P03.6 Record real endpoint evidence, latency/cost metadata if provided, and verified integration tests (redacted of any keys). SDK usage aggregation and 30 offline tests are implemented; real values remain unknown.
-
-## P04 — Genuine source evidence and PDF workflow [IN PROGRESS — P04.1 VERIFIED]
-- [x] P04.1 Accept constrained text-based PDF inputs (2 MB/12 pages/12k chars), preview extracted source text and page offsets, and reject scans/passwords/corrupt/oversized files. UI: individual old/new uploaders and download-ready fictional sample PDFs. Zero Clocked calls for preview. (2026-11-09)
-- [ ] P04.2 Extract rules through Clocked PDF mode and correctly interpret its returned page offsets.
-- [ ] P04.3 Display available Clocked-highlighted PDF outputs; fail gracefully if a PDF can't be marked.
-- [ ] P04.4 Connect a case's reason to the evidence position, page, and policy version.
-- [ ] P04.5 Add PDF-specific live-integrated tests. Offline preview tests (7) plus Chromium interaction checks pass; Clocked PDF-mode tests are still pending.
-
-## P05 — Memorable judge demonstration [QUEUED]
-- [ ] P05.1 Add a second fictional scenario with a clear *gain* as well as a *loss*.
-- [ ] P05.2 Add a 60–120-second in-app guided story: change → affected applicant → evidence → counterfactual.
-- [ ] P05.3 Improve distinctiveness (motion, accessibility, evidence-first design), keeping all controls functional.
-- [ ] P05.4 Export a compact, transparent evidence report with synthetic/live provenance labels.
-
-## P06 — Correctness, safety and visual QA [QUEUED]
-- [ ] P06.1 Regression suite across boundaries, absent rules, contradictory directions, bad input, and simultaneous failures.
-- [ ] P06.2 Basic security: no secrets in responses or files, live endpoint cost cap, useful API errors, no frontend key exposure.
-- [ ] P06.3 Browser testing at desktop and mobile widths; fix overflow and keyboard navigation issues. (Isolated Chromium synthetic smoke passed at 1440px and 390px; live HTTP/keyboard review remains.)
-- [ ] P06.4 Run an end-to-end test of the public judging workflow with **live** Clocked if configured.
-
-## P07 — Deploy and submit [QUEUED]
-- [ ] P07.1 Publish a public repository with accurate source history, setup instructions and test evidence.
-- [ ] P07.2 Deploy a judge-accessible version. Set backend-only env vars in hosting settings.
-- [ ] P07.3 Verify the deployment, demo fixture, real API flow and evidence trace on the public URL.
-- [ ] P07.4 Record a concise screen demo and write submission copy describing actual endpoint usage.
-- [ ] P07.5 Submit before the published deadline; check confirmation and links.
-
-## Scope / non-goals
-This is a *decision simulation* for **fictional scholarship applicants**, not a production aid-decision system. There is no guarantee of any award. Only two modeled requirements are eligible for automatic evaluation; any other case is flagged for review. User credentials and real personal applicant data are not necessary for the hackathon demo.
-
-### P03.1b — Cost safety and billing telemetry [COMPLETE; 2026-11-09]
-- [x] Default live budget to zero; require explicit `ENABLE_LIVE=true` **and** positive `MAX_LIVE_ANALYSES`.
-- [x] Capture optional SDK `credits`, `cost_usd` and `model_ms` for the four real Clocked calls without extra API requests.
-- [x] Display a real credit total only when all SDK metadata is present; never invent credit/cost values.
-- [x] Test fail-closed budget, metered fake SDK, and missing usage metadata. 30 offline tests + Chromium mock smoke passed.
-- [ ] Public live mode needs durable global quotas and authentication before enabling judge access; the in-process counter is only a soft cap.
+The case data is fictional. Ripple is a narrow decision simulator, **not** a production scholarship eligibility service.

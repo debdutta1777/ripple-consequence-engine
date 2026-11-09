@@ -84,3 +84,32 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Added SDK credit/cost/latency metadata to a live response, provided the SDK reports it; also show credits in the UI only when present. This instrumentation does not create extra Clocked calls.
 - `python -m pytest -q`: **30 passed**; `node --check web/app.js`: **passed**; `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`: **passed** with mock API. No real Clocked credits consumed.
 - Real SDK contract/latency/billing values are still unknown, so P03.2 onward remains incomplete.
+
+### P05 — Consequence-first judge experience [COMPLETE LOCALLY; 2026-11-09]
+- Added the interactive, keyboard-selectable **Consequence Map**, recalculated directly from the underlying two-rule evaluator; 16 line paths corresponding to 16 fictional applicants.
+- Added a **Rule Lab** to adjust the updated GPA and income limits and recalculate all applicant transitions instantly. Includes **Tighter rules** and **Wider access** presets and Reset. Explicitly labels rules as hypothetical; leaves original source evidence untouched. No Clocked requests.
+- Added a four-step guided tour and dynamic badges; the hero remains light-mode first, with optional saved dark mode.
+- Added a page-aware **Source Lens** that highlights exact textual source clauses and can open the locally uploaded original PDF at its source page, when the source is current and uniquely matched.
+- Added an exportable, self-contained printable HTML proof card for a single case. Escapes dynamic text and flags hypothetical rules; no real applicant data in the default sample.
+- Chromium offline smoke tested flow paths, keyboard selection, both policy presets, theme, tour, PDF ingestion, source lens, evidence selection and proof HTML download, across mobile through desktop widths.
+
+### P03.2a / P04.3 — Protected live verification and PDF annotation [IMPLEMENTED; NOT LIVE VERIFIED]
+- Public `/api/analyze` now requires an expiring, server-only verifier key on top of its separate LIVE gate; the public site continues to report `live_enabled: false` and **cannot** trigger API charges by clicking sliders or upload controls.
+- Added `POST /api/internal/verify-clocked`, which (only when explicitly unlocked) performs Extract ×2 + Compare ×1 + Rerank ×1 against the fixed fictional sample, with `Clocked(max_attempts=1)`. Output contains limited sanitized threshold/usage metadata and no raw secrets.
+- Added `POST /api/internal/pdf-proof`: one separate optional Clocked Compare request with `return_pdf="highlight"` on the bundled synthetic PDFs. It exports only the real SDK `marked_pdf()` bytes, otherwise writes a manifest identifying missing annotations. The flow is fake-SDK tested but **not authenticated on real Clocked**.
+- The token must be 32+ characters; an explicit future timestamp and `ENABLE_VERIFICATION=true` are both required. Invalid auth fails with 404. Protected routes are hidden from public OpenAPI descriptions.
+- Added `Cache-Control: no-store` to API routes, frame denial, referrer policy and `nosniff`. Added negative tests for gate, token expiry, missing PDF annotations, invalid PDF-before-billing, and route headers.
+
+### P06 — Offline QA and submission handoff [COMPLETE OFFLINE; LIVE CHECK REMAINS]
+- `python -m pytest -q`: **37 passed**.
+- `node --check web/app.js`: **passed**.
+- `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`: **passed** (isolated synthetic fetch stub, NOT live HTTP or real Clocked).
+- Wrote judge walkthrough, submission draft, security review, SDK integration contract, deployment instructions, explicit real-verification results placeholder and GitHub Actions offline CI workflow.
+- No real Clocked call was made as part of the above tests; token/key was never accessed.
+
+## Pending at end of P05/P06 local work
+
+1. Confirm the final main-branch push and Vercel Ready Production deployment. The user confirmed an earlier light-mode deployment, not this release.
+2. Perform at most one protected four-call live Clocked smoke if a short-lived verifier can be configured and securely invoked; otherwise leave status UNVERIFIED.
+3. If possible, verify Clocked's genuine `return_pdf="highlight"` marked PDF output (one additional protected call). No fabricated source highlight will be called Clocked output.
+4. Record the challenge's external submission result separately; code deployment alone is **not** submission.

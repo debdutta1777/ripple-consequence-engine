@@ -1,28 +1,36 @@
-# Safely connect your Clocked API key
+# Secure Clocked connection and one-time verification
 
-**Do not paste your API key into ChatGPT or a GitHub issue.** The current chat does not provide a dedicated secret-vault input that can be used for the local runtime. The key belongs only in a local ignored environment file, a process environment variable, or your deployment provider's secret settings.
+The real `CLOCKED_API_KEY` is stored as a **Sensitive** Production environment variable in the user's Vercel project. Its **metadata was verified without decrypting the key**. Never paste it into ChatGPT, GitHub, terminal output, the client-side JavaScript or a downloadable artifact.
 
-## Windows PowerShell (recommended for this project)
+## Public site defaults
 
-1. Open a terminal in the `ripple-consequence-engine` project directory.
-2. Copy the provided template: `Copy-Item .env.example .env`.
-3. Open it locally with `notepad .env`. Set `CLOCKED_API_KEY=<your secret>`. Keep `ENABLE_LIVE=false` and `MAX_LIVE_ANALYSES=0` until a controlled live test is approved. Save the file **on your computer only**.
-4. Install dependencies: `py -m pip install -r requirements.txt`.
-5. Start the backend: `py -m uvicorn app.main:app --reload`.
-6. Visit `http://127.0.0.1:8000/api/health`. It should show `"live_enabled": false` until you explicitly opt into a test with `ENABLE_LIVE=true` and a positive `MAX_LIVE_ANALYSES` value.
-7. Open `http://127.0.0.1:8000` and use **Analyze live** only when ready to spend credits.
+```dotenv
+CLOCKED_API_KEY=               # real value only in Vercel's Sensitive secret UI
+ENABLE_LIVE=false
+MAX_LIVE_ANALYSES=0
+ENABLE_VERIFICATION=false
+RIPPLE_VERIFY_TOKEN=           # independently generated 32+ character secret, not public
+RIPPLE_VERIFY_UNTIL=0          # UNIX epoch seconds, short window
+```
 
-The local `.env` is ignored by Git, and `app/main.py` loads it at startup. This is practical local secret storage, though anyone with access to your local files/account could read it. For more restrictive security, use your OS's secret manager or transient process environment instead.
+The site intentionally reports `live_enabled: false` in `/api/health`, because the public demo is credit-free. Even if an owner enables `ENABLE_LIVE`, the costly `/api/analyze` route still requires the same expiring administrator verification token. **A per-server-process counter is not a global Vercel billing quota**; do not treat it as one.
 
-## Hosting
+## Controlled one-time Clocked smoke
 
-On Vercel, set `CLOCKED_API_KEY` as a **Sensitive** Production environment variable. Keep `ENABLE_LIVE=false` while testing the free demo. Only briefly turn on `ENABLE_LIVE=true` with `MAX_LIVE_ANALYSES=1` for a planned test; disable it immediately afterward and redeploy so the change takes effect. Never commit `.env`. Hosting values take priority over local `.env`.
+1. Generate a high-entropy random token privately (e.g. Python `secrets.token_urlsafe(40)`) and store it as a Vercel **Sensitive** Production variable named `RIPPLE_VERIFY_TOKEN`. Never commit or print it.
+2. Set `ENABLE_VERIFICATION=true` (Config) and `RIPPLE_VERIFY_UNTIL=<current epoch + 10 min>` (Config) in Production.
+3. Redeploy the current reviewed source to make variables effective.
+4. The authorized owner issues **one** `POST /api/internal/verify-clocked` with header `X-Ripple-Verify: <token>` using a trusted client. It sends only the two fictional sample policies and 16 fictional applicants. Four potential billable calls: Extract ×2, Compare ×1, Rerank ×1. SDK retries are disabled for this short test.
+5. Record the sanitized result (rule thresholds, endpoint result counts, `credits`/`cost_usd` if reported). If any part is missing, record `needs_review`—**do not fabricate a successful result**.
+6. Optional: issue one further `POST /api/internal/pdf-proof` with the same header to obtain ZIP output from Clocked Compare PDF with `return_pdf="highlight"`. That may consume an additional request. Marked PDFs are included only if the SDK genuinely returned them.
+7. Immediately set `ENABLE_VERIFICATION=false` and redeploy. A short token expiration is a safety net; it is not a durable global consumption quota.
 
-**Important:** `MAX_LIVE_ANALYSES` is an in-process convenience guard, not a global or durable spending cap; Vercel can create fresh serverless instances. Never leave a public, unauthenticated live endpoint enabled relying on this counter alone. Use an authenticated endpoint and durable quota enforcement for any ongoing public live traffic.
+If private HTTP execution or Vercel environment permissions are unavailable, **do not** retrieve the user's key to compensate. Leave live verification pending and keep the public demo safe. The user may carry out the one-time protected test from their own authenticated environment.
 
-## Safety checklist
+## Local development
 
-- `.env` must never be included in the download ZIP, Git repo, screenshots, test snapshots or debug logs.
-- Never add `CLOCKED_API_KEY` to the web frontend, frontend build variables, browser local storage or request bodies.
-- Rotate the key in Clocked if you accidentally expose it.
-- Live API behavior is **not yet validated**; integration must be tested after you configure the key.
+In an untracked local `.env` file, set the key without sharing it. Use `python -m pytest -q` and `python -m scripts.browser_smoke` freely: neither makes real Clocked calls. The direct `python -m scripts.smoke_clocked --run` script makes four real calls and requires explicit approval; omit `--run` for its safe dry-run.
+
+## After a successful run
+
+Update `docs/VERIFICATION_RESULTS.md`, `checkpoint.json` and `docs/BUILD_CHECKPOINT.md`. Ensure screenshots, public JSON and Git commits include **no secrets**. Rotate the verifier token or revoke it; do not make it a permanent admin credential.

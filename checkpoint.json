@@ -1,61 +1,57 @@
 {
-  "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 4,
+  "project": "Ripple \u2014 The Consequence Engine",
+  "checkpoint_version": 5,
   "last_updated": "2026-11-09",
-  "last_completed": "P03.1b",
-  "current_phase": "P03",
+  "last_completed": "P05",
+  "current_phase": "P03.2",
   "completed_phases": [
     "P00",
     "P01",
     "P02",
     "UI-01",
-    "P04.1",
     "P03.1",
-    "P03.1b"
+    "P03.1b",
+    "P04.1",
+    "P04.2-offline",
+    "P05",
+    "P06-offline"
   ],
   "phases": {
     "P00": "complete",
     "P01": "complete",
     "P02": "complete",
-    "P03": "in_progress",
-    "P04": "in_progress",
-    "P05": "queued",
-    "P06": "queued",
-    "P07": "queued",
     "UI-01": "complete",
-    "P04.1": "complete",
-    "P03.1": "complete",
-    "P03.1b": "complete"
+    "P03": "in_progress_live_clocked_unverified",
+    "P04": "partial_live_pdf_annotation_unverified",
+    "P05": "complete_offline",
+    "P06": "complete_offline_live_qa_pending",
+    "P07": "in_progress_public_site_user_confirmed_latest_build_pending"
   },
   "verified": {
-    "python_tests": "30 passed on 2026-11-09 (offline, includes 3 new cost guard/usage tests)",
+    "python_tests": "37 passed locally on 2026-11-09 (all offline/mock)",
     "javascript": "node --check web/app.js passed",
-    "baseline_synthetic": true,
+    "chromium_smoke": "Passed offline for light/dark theme, case cards, consequence paths, Rule Lab slider and presets, SVG keyboard navigation, guided tour, PDF preview, evidence source lens, HTML proof download and 390-1440px breakpoints",
     "live_clocked_calls": false,
-    "browser_visual_qa": "Isolated Chromium, synthetic API mock: light/dark toggle, decision flips, filters, PDF upload text preview, stale-result guard, responsive widths; no live Clocked calls.",
-    "public_deployment": "User verified UI-01 light redesign appeared at https://ripple-consequence-engine.vercel.app/. PDF milestone not yet confirmed deployed.",
-    "clocked_cli_smoke": "scripts/smoke_clocked.py --run prepared; no key configured",
-    "ui_light_default": true,
-    "ui_dark_toggle": "Passed isolated Chromium + localStorage guarded, CSS transitions verified",
-    "ui_filtering": "All / lost / gained / stable / review in Chromium",
-    "local_http_routes": "200 for /, /assets/styles.css, /assets/app.js, /api/health, /api/demo; browser local HTTP blocked by sandbox policy",
-    "vercel_git_connection": "Project appears in Vercel project search; linked GitHub import reported by user",
-    "pdf_text_preview": "Validated up to 2 MB and 12 pages, local request-only parsing with pypdf; sample text PDFs served via /assets/samples/. No OCR, no Clocked request.",
-    "clocked_secret_metadata": "Confirmed Vercel project has CLOCKED_API_KEY with type Sensitive and Production target via decrypt=false. Value was not accessed.",
-    "usage_telemetry": "SDK metadata aggregation for extract x2 + compare + rerank implemented and offline-tested; no real billing values observed.",
-    "live_gate": "ENABLE_LIVE=true plus explicit MAX_LIVE_ANALYSES>0 required; missing config fails closed; 0 real Clocked calls. Process budget is not durable on serverless."
+    "clocked_secret_metadata": "Sensitive Production CLOCKED_API_KEY existence confirmed without decrypting (no secret read)",
+    "public_deployment": "User confirmed earlier light-first Vercel deployment, not yet this release",
+    "demo_no_paid_requests": true,
+    "protected_verifier": "Implemented and fake-SDK tested; requires explicit admin token, expiry, flag and separate temporary redeployment",
+    "pdf_native_marking": "Implemented with SDK marked_pdf call, mock-only; actual annotation is unknown",
+    "source_lens": "Verbatim source fragment highlight, page-aware original PDF navigation in browser; not the SDK native marked PDF",
+    "repository": "debdutta1777/ripple-consequence-engine",
+    "production_url": "https://ripple-consequence-engine.vercel.app/"
   },
   "blockers": [
-    "P03.2-P03.4: User Clocked secret metadata present, but authenticated endpoint responses are not yet verified. ENABLE_LIVE remains off; MAX_LIVE_ANALYSES default 0.",
-    "Live endpoint is public if enabled; in-process budget is not global/durable on Vercel. Require supervised testing and durable quota/access control before enabling public paid use.",
-    "P04.2-P04.4: True Clocked PDF mode and annotated PDF require response contract verification.",
-    "Production deploy status after this commit requires independent verification."
+    "Authentic Clocked Extract, Compare, Rerank and marked-PDF output not yet run; no SDK response and no actual paid credit totals are verified.",
+    "Latest GitHub push/Vercel Production deployment has not yet been verified. A prior light UI version was user-confirmed.",
+    "Hackathon submission on the organizer website remains a separate, unconfirmed user action."
   ],
   "next_actions": [
-    "Push cost-safety and telemetry changes to GitHub; confirm Vercel picked up new commit and health remains demo-only.",
-    "Plan a supervised 4-call synthetic Clocked smoke test without making the public /api/analyze endpoint generally available.",
-    "Adjust SDK field/compare/rerank mappings after observing sanitized real response metadata; record true credit usage.",
-    "Proceed with Clocked PDF evidence and annotated PDF integration."
+    "Push the release with P05, protected admin verification and documentation to GitHub.",
+    "Verify the exact release commit is Ready on Vercel and test safe public /api/health and /api/demo.",
+    "Make at most one narrowly scoped authenticated Clocked smoke call only if expiring verifier secret can be safely configured; do not expose public paid routes.",
+    "Record actual evidence in docs/VERIFICATION_RESULTS.md only after success, otherwise keep unverified flag.",
+    "Prepare a concise demo recording and have user complete the external hackathon submission confirmation."
   ],
-  "notes": "All 27 tests and Chromium smoke are local, offline, and do not establish real Clocked API success. PDF preview is separate from live semantic analysis and no PDF data is persisted by the app."
+  "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
 }
