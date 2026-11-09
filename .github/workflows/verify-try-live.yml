@@ -4,6 +4,7 @@ on:
     branches: [try-live-proof-20261110]
     paths:
       - .github/workflows/verify-try-live.yml
+      - scripts/verify_try_live.py
 permissions:
   contents: read
 concurrency:
