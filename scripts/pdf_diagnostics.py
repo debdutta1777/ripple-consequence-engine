@@ -4,16 +4,17 @@ import os, sys
 from clocked_sdk import Clocked
 from app.clocked_adapter import _root_json
 from app.pdf_ingest import parse_policy_pdf
+from scripts.build_compact_pdf import pdf_for
 
 samples=Path("web/samples")
-inputs=[("previous",samples/"judge-policy-2025.pdf"),("current",samples/"judge-policy-2026.pdf")]
+inputs=[("previous",pdf_for(2025)),("current",pdf_for(2026))]
 for name,p in inputs:
-    src=parse_policy_pdf(p.read_bytes())
+    src=parse_policy_pdf(p)
     print("SOURCE",name,"pages",src["page_count"],"characters",src["characters"])
 if not os.environ.get("CLOCKED_API_KEY"):
     raise SystemExit("Missing Actions secret")
 with Clocked(timeout=90,max_attempts=1) as client:
-    res=client.compare(documents=[{"id":name,"pdf":p.read_bytes()} for name,p in inputs],return_text=True,return_pdf="highlight")
+    res=client.compare(documents=[{"id":name,"pdf":p} for name,p in inputs],return_text=True,return_pdf="highlight")
 data=_root_json(res)
 print("VERDICT",data.get("verdict"),"CONFLICTS",len(data.get("conflicts") or []),"CREDITS",getattr(res,"credits",None))
 pdfs=data.get("pdf")
