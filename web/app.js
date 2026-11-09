@@ -267,7 +267,7 @@ function render(){
   const counts=d.impact.counts;
   $('stat-total').textContent=d.impact.total;
   ['lost','gained','review'].forEach(k=>$('stat-'+k).textContent=counts[k]||0);
-  $('mode-indicator').innerHTML='<span class="mode-dot"></span> '+(isRuleScenario()?'WHAT-IF SIMULATION':d.mode==='live'?'LIVE CLOCKED ANALYSIS':'SYNTHETIC DEMO');
+  $('mode-indicator').innerHTML='<span class="mode-dot"></span> '+(isRuleScenario()?'WHAT-IF SIMULATION':d.mode==='live'?'LIVE CLOCKED ANALYSIS':d.mode==='offline'?'LOCAL RULE PREVIEW':'SYNTHETIC DEMO');
   $('mode-indicator').classList.toggle('live',d.mode==='live');
   const pieces=['lost','gained','retained','excluded','review'].map(k=>({key:k,n:counts[k]||0}));
   $('dist-bar').innerHTML=pieces.map(p=>`<div class="dist-segment ${p.key}" style="width:${d.impact.total?p.n/d.impact.total*100:0}%" title="${p.key}: ${p.n}"></div>`).join('');
@@ -300,9 +300,9 @@ function render(){
   renderFlow();
   renderRuleLab();
   renderSourceLens();
-  const calls=d.api_calls?.length?d.api_calls.join(' · '):'No Clocked calls: this is a synthetic demonstration.';
+  const calls=d.api_calls?.length?d.api_calls.join(' · '):'No Clocked calls: credit-free deterministic preview.';
   const billed=d.mode==='live'&&d.usage?.credits!=null?` · ${d.usage.credits} SDK-reported credits this run`:'';
-  $('backend-disclosure').textContent=d.mode==='live'?`Clocked API calls: ${calls}${billed}. ${isRuleScenario()?'A hypothetical rule change is being simulated; it is not sourced to the document. ':''}Policy rules drive deterministic case decisions; missing evidence requires human review.`:`${calls} ${isRuleScenario()?'Hypothetical thresholds are an unsourced sandbox simulation. ':''}This fictional sample uses deterministic GPA/income checks. Live API analysis is a separate protected action.`;
+  $('backend-disclosure').textContent=d.mode==='live'?`Clocked API calls: ${calls}${billed}. ${isRuleScenario()?'A hypothetical rule change is being simulated; it is not sourced to the document. ':''}Policy rules drive deterministic case decisions; missing evidence requires human review.`:`${calls} ${isRuleScenario()?'Hypothetical thresholds are an unsourced sandbox simulation. ':''}Only explicit GPA/income rules are evaluated. This is not a Clocked result; unsupported rules require human review.`;
   $('trace-output').textContent=JSON.stringify({mode:d.mode,notice:d.notice,api_calls:d.api_calls,usage:d.usage,comparison:d.comparison,extraction:d.extraction,relevance:d.relevance},null,2);
 }
 function renderCase(){
@@ -345,6 +345,22 @@ function renderCase(){
 async function loadDemo(){
   try{const r=await fetch('/api/demo');if(!r.ok)throw new Error('Demo server not available');resetPdfState();setData(await r.json());}
   catch(err){toast('The demo could not load. Start the FastAPI server and refresh.');console.error(err);}
+}
+async function preview(){
+  const btn=$('preview-policy'), label=btn.innerHTML;
+  btn.disabled=true;btn.textContent='Checking explicit rules…';
+  try{
+    const before=$('old-policy').value, after=$('new-policy').value;
+    const people=(ui.data?.impact?.cases||[]).map(({id,name,gpa,income})=>({id,name,gpa,income}));
+    const response=await fetch('/api/preview', {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({old_policy:before,new_policy:after,applicants:people})});
+    const result=await response.json();
+    if(!response.ok)throw new Error(typeof result.detail==='string'?result.detail:'Could not preview the rules.');
+    setData(result,{preserveInput:true});
+    ui.data.documents={old:before,new:after};
+    toast('Credit-free rule preview complete. Only GPA and USD income thresholds were evaluated; Clocked was not called.');
+  }catch(err){toast(err.message||'Preview failed.');}
+  finally{btn.disabled=false;btn.innerHTML=label;}
 }
 async function analyze(){
   const btn=$('analyze-live');btn.disabled=true;const original=btn.innerHTML;btn.textContent='Analyzing…';
@@ -390,6 +406,7 @@ function wireEvents(){
   document.querySelectorAll('.rail-item').forEach(link=>link.addEventListener('click',()=>{
     document.querySelectorAll('.rail-item').forEach(item=>item.classList.toggle('active',item===link));
   }));
+  $('preview-policy').addEventListener('click',preview);
   $('analyze-live').addEventListener('click',analyze);
   $('gpa-range').addEventListener('input',e=>{ui.gpa=Number(e.target.value);renderCase()});
   $('income-range').addEventListener('input',e=>{ui.income=Number(e.target.value);renderCase()});
@@ -427,12 +444,12 @@ async function boot(){
     if(!h.live_enabled){
       $('analyze-live').disabled=true;
       $('analyze-live').title='Live analysis is administrator-only while the credit-safe verification gate is locked.';
-      $('live-explainer').textContent='Live Clocked analysis is locked to protect your API credits. The fictional cohort, Consequence Map, Rule Lab, PDF text preview and source lens are free to explore.';
+      $('live-explainer').textContent='Use Preview policy changes to recalculate the fictional cohort from clear GPA and USD income clauses, for free. Ambiguous or additional requirements are marked Needs review. Real Clocked analysis is administrator-only until separately verified.';
     }
   }catch{
     $('api-status').textContent='Backend unavailable';
     $('analyze-live').disabled=true;
-    $('live-explainer').textContent='Backend unavailable. Refresh when the API is running; no key is stored in the browser.';
+    $('live-explainer').textContent='Backend unavailable; retry after refreshing. No key is stored in the browser.';
   }
   await loadDemo();
 }

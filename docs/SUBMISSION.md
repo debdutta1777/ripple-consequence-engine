@@ -52,3 +52,7 @@ Open the sample. Follow any red path in the Consequence Map, inspect why it lost
 - Vercel: Production READY for that exact commit; stable public alias attached.
 - Recorded media: 61-second synthetic UI walkthrough supplied as a separate MP4 artifact, not uploaded publicly or submitted yet.
 - Reminder: a Vercel deployment is **not** a hackathon submission confirmation.
+
+### Audit note (2026-11-09)
+
+An additional free **Preview policy changes** button now recalculates the fictional cohort for narrow, explicit rules from a user's uploaded or pasted text. This uses local deterministic parsing, **not** Clocked. The project has 45 passing offline tests, a Chromium UI regression, and a real FastAPI TestClient/Chromium upload-preview test. Authenticated Clocked results remain unverified; do not claim them as completed during judging.

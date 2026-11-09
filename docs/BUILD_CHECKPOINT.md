@@ -121,3 +121,13 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Created a **61-second** silent screen walkthrough of the synthetic browser demo with an intro/outro slate and optional timed subtitles. This is not a live Clocked recording. Files delivered separately for upload to a video host or submission form.
 - Direct HTTP checks of public `/api/health` and `/api/demo` and a real Clocked call are still outstanding. Do not claim either from deployment metadata alone.
 - Code deployment is complete; **external hackathon submission is not yet confirmed**.
+
+
+### P06.5 — Full release audit and credit-free policy preview [code complete; 2026-11-09]
+- Audited production route protections, SDK adapter, upload limits, UI renderers, and Vercel secret metadata. Avoided retrieving the key.
+- Confirmed a real UX gap: once a user uploaded new PDF text, the public site had no way to recalculate impacted cases while paid analysis was locked.
+- Added `POST /api/preview` and a **Preview policy changes** action; strict offline-only rule extractor supports one minimum GPA and USD annual household income ceiling per policy, with additional requirements/ambiguity producing review instead of a fabricated positive decision.
+- Added six new parser/route checks plus two ambiguity regression cases: **45 unit tests passing**, JS syntax passing.
+- Ran isolated Chromium UI regression AND `scripts/fullstack_smoke.py`, which bridges Chromium interactions to real FastAPI TestClient handlers for PDF parsing, preview, and decision evidence. No external paid calls.
+- Real Clocked authentication still not demonstrated: key exists as Vercel Sensitive metadata, but verification requires separate temporary admin token; Vercel web fetch denies deployment access. Do not publish a successful live claim.
+- New source must be verified as Vercel READY after commit; do not conflate a prior production release with this new version.

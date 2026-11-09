@@ -92,3 +92,9 @@ xvfb-run -a -s "-screen 0 1440x900x24" env CHROMIUM_PATH=/usr/bin/chromium pytho
 ```
 
 The separately delivered `Ripple_Judge_Walkthrough.mp4` is a 61-second visual demonstration with no voiceover; `docs/JUDGE_DEMO.md` provides a spoken narration. This is not evidence of authenticated Clocked responses.
+
+## Credit-free custom policy preview (audited 2026-11-09)
+
+The public **Preview policy changes** action updates the fictional cohort using the user's uploaded or pasted policy texts without an external Clocked request. It supports only **one explicitly worded minimum GPA and one USD annual household-income ceiling per document**. Unknown rules, extra requirements and ambiguities produce **Needs review**. This heuristic is not Clocked extraction; do not represent its results as authenticated API evidence. Run `python -m pytest -q` (45 passing tests) and `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.fullstack_smoke` to exercise the real FastAPI handlers through the browser without paid calls.
+
+For actual authenticated Clocked verification, follow `docs/SECURE_API_SETUP.md`: temporary privately configured verifier, controlled requests against fictional policy data, then immediate disablement. No real response has been confirmed yet.

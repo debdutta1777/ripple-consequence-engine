@@ -14,6 +14,7 @@ from app.demo import make_demo, APPLICANTS, OLD_TEXT, NEW_TEXT
 from app.clocked_adapter import analyze_live
 from app.pdf_ingest import parse_policy_pdf, PdfInputError, MAX_PDF_BYTES
 from app.clocked_pdf import create_marked_comparison
+from app.offline_preview import preview_policies
 
 ROOT = Path(__file__).resolve().parent.parent
 # Local configuration only; never serve or commit the real .env file.
@@ -70,6 +71,13 @@ def health():
 @app.get("/api/demo")
 def demo():
     return make_demo()
+
+@app.post("/api/preview")
+def local_preview(payload: AnalyzeRequest):
+    """Free deterministic preview. Never uses or exposes Clocked credentials."""
+    people = [p.model_dump() for p in payload.applicants] or APPLICANTS
+    return preview_policies(payload.old_policy, payload.new_policy, people)
+
 
 @app.post("/api/parse-pdf")
 async def parse_pdf(file: UploadFile = File(...)):
