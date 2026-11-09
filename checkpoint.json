@@ -1,9 +1,9 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 14,
+  "checkpoint_version": 15,
   "last_updated": "2026-11-10",
-  "last_completed": "P04.3_live_native_pdf_highlighting_verified",
-  "current_phase": "P07_official_hackathon_submission_pending",
+  "last_completed": "TRY-01_uploaded_policy_analysis_workflow",
+  "current_phase": "P07_submission_pending_live_general_policy_support_scope_limited",
   "completed_phases": [
     "P00",
     "P01",
@@ -18,7 +18,8 @@
     "P06.5-offline",
     "LP-01",
     "P03.2",
-    "P04.3"
+    "P04.3",
+    "TRY-01"
   ],
   "phases": {
     "P00": "complete",
@@ -30,7 +31,8 @@
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
     "P07": "audit_release_deployed_submission_unconfirmed",
-    "LP-01": "complete_deployed"
+    "LP-01": "complete_deployed",
+    "TRY-01": "complete_offline_public_uploaded_pdf_and_cohort_workflow"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -76,15 +78,28 @@
       "requests": 5,
       "credits": 33
     },
-    "manual_pdf_workflow": ".github/workflows/verify-clocked-pdf.yml (workflow_dispatch only)"
+    "manual_pdf_workflow": ".github/workflows/verify-clocked-pdf.yml (workflow_dispatch only)",
+    "try_it_yourself": {
+      "route": "/try",
+      "source": "user-uploaded previous and updated PDF docs",
+      "logic": "real bounded FastAPI PDF parsing, literal line comparison, deterministic GPA + USD income preview",
+      "applicant_cohort": "16 clearly fictional samples OR optional uploaded CSV up to 100 rows",
+      "tested": "50 Python tests + Chromium with real FastAPI TestClient, two PDF uploads, custom 2-person CSV, charts, filters, source links, CSV export, light/dark, and widths 390/768/1024",
+      "github_commit": "84d9b454fa8b2b305f464c7c2a1e77816d46f867",
+      "ci_fix": "e1f089907d1ffdbce17858e59f1d3c8e4b615faf; GitHub Actions CI run 42702622581 passed",
+      "cost": "No live Clocked calls on public /try",
+      "limitations": "Not semantically complete for arbitrary policies; unsupported clauses mark review; real applicants must be provided; OCR unsupported"
+    }
   },
   "blockers": [
-    "Official hackathon submission/receipt not confirmed; core technical Clocked text and native-PDF fixture integrations have now passed.",
-    "Custom uploaded policies/scanned PDFs/exception-heavy rules remain unverified, and the public Studio intentionally runs a credit-free deterministic preview."
+    "Public /try supports only simple scholarship GPA and USD income rules and literal line changes; arbitrary custom policies can require review. It is not a universal compliance engine.",
+    "Real Clocked API operations validated separately with fictional fixtures, not yet wired as public uploaded-PDF processing.",
+    "Official hackathon submission is not confirmed."
   ],
   "next_actions": [
-    "Submit official Clocked challenge entry with public URL, GitHub repository, judge walkthrough and authenticated verification logs; retain the submission receipt.",
-    "If real uploads or public live processing are required, add quota-backed server-side live analysis with explicit user messaging and validate non-fixture documents."
+    "Verify latest Vercel production release and public /try route; provide direct judge link.",
+    "Submit official hackathon entry and retain receipt.",
+    "If requested, build safe quota-backed optional Clocked live analysis for uploaded policies; public /try currently uses a deterministic preview, not paid API calls."
   ],
-  "notes": "P03.2 verified real text Extract x2, Compare x1, Rerank x1 (24 credits); P04.3 verified real SDK-native Compare PDF highlighted output (9 credits). Five authenticated calls used 33 SDK-reported credits. Both workflows are manually runnable; no secrets committed."
+  "notes": "P03.2 verified real text Extract x2, Compare x1, Rerank x1 (24 credits); P04.3 verified real SDK-native Compare PDF highlighted output (9 credits). Five authenticated calls used 33 SDK-reported credits. Both workflows are manually runnable; no secrets committed. TRY-01 delivered public two-PDF upload UI with optional applicant cohort CSV; no user authentication or paid calls. UI inspiration derived from user-supplied AuditEase screenshots; branding and layout are Ripple-specific."
 }
