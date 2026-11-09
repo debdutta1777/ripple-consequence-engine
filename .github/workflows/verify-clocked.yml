@@ -1,0 +1,86 @@
+name: Verify Clocked API (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ripple-clocked-live-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Four-request Clocked smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed main branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.11'
+
+      - name: Install Ripple API dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Authenticate with Clocked and verify real responses
+        env:
+          CLOCKED_API_KEY: ${{ secrets.CLOCKED_API_KEY }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import sys
+
+          if not os.environ.get("CLOCKED_API_KEY"):
+              print("FAIL: Configure CLOCKED_API_KEY under repository Actions secrets.")
+              sys.exit(1)
+
+          try:
+              from clocked_sdk import Clocked
+              from app.clocked_adapter import analyze_live
+              from app.demo import OLD_TEXT, NEW_TEXT, APPLICANTS
+
+              with Clocked(timeout=90, max_attempts=1) as client:
+                  result = analyze_live(client, OLD_TEXT, NEW_TEXT, APPLICANTS)
+
+              old = result["policies"]["old"]
+              new = result["policies"]["new"]
+              actual = (old["min_gpa"], old["max_income"], new["min_gpa"], new["max_income"])
+              expected = (3.2, 50000, 3.5, 60000)
+              comparison = result["comparison"]
+              ranked = result["relevance"]
+
+              print("AUTHENTICATED CLOCKED VERIFICATION SUMMARY")
+              print("API operations:", ", ".join(result["api_calls"]))
+              print("Actual extracted values:", actual)
+              print("Expected extracted values:", expected)
+              print("Comparison verdict:", str(comparison.get("verdict"))[:100])
+              print("Comparison conflict count:", len(comparison.get("conflicts") or []))
+              print("Rerank item count:", len(ranked))
+              usage = result.get("usage") or {}
+              print("SDK-reported request count:", usage.get("request_count"))
+              print("SDK-reported credits:", usage.get("credits"))
+
+              if actual != expected:
+                  print("FAIL: Extracted policy values differ from expected fictional fixtures.")
+                  sys.exit(1)
+              if comparison.get("verdict") is None:
+                  print("FAIL: Compare did not return a verdict.")
+                  sys.exit(1)
+              if not ranked:
+                  print("FAIL: Rerank returned no relevance results.")
+                  sys.exit(1)
+
+              print("PASS: Real Clocked Extract, Compare, and Rerank verified on fictional policies.")
+          except Exception as exc:
+              # Do not print upstream error text: it may contain request details.
+              print("FAIL: Live Clocked integration raised", type(exc).__name__)
+              sys.exit(1)
+          PY
