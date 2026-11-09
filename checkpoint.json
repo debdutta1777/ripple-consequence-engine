@@ -1,8 +1,8 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 7,
+  "checkpoint_version": 8,
   "last_updated": "2026-11-09",
-  "last_completed": "P06.5_offline_preview_and_fullstack_audit",
+  "last_completed": "P07.3_deployed_audit_release",
   "current_phase": "P03.2_authenticated_clocked_validation",
   "completed_phases": [
     "P00",
@@ -26,7 +26,7 @@
     "P04": "partial_live_pdf_annotation_unverified",
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
-    "P07": "previous_production_release_verified_latest_changes_pending"
+    "P07": "audit_release_deployed_submission_unconfirmed"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -34,20 +34,20 @@
     "chromium_smoke": "Passed offline for light/dark theme, case cards, consequence paths, Rule Lab slider and presets, SVG keyboard navigation, guided tour, PDF preview, evidence source lens, HTML proof download and 390-1440px breakpoints",
     "live_clocked_calls": false,
     "clocked_secret_metadata": "Sensitive Production CLOCKED_API_KEY existence confirmed without decrypting (no secret read)",
-    "public_deployment": "Verified by connected Vercel: commit 5f93b5fa167e7efd4171d997e23aad2a5deaad63 is READY Production, stable ripple-consequence-engine.vercel.app alias points to this deployment.",
+    "public_deployment": "Vercel reported audit release 469d3037f1271afead81f59ec0827ef6fcc994fb as READY production, with stable alias ripple-consequence-engine.vercel.app.",
     "demo_no_paid_requests": true,
     "protected_verifier": "Implemented and fake-SDK tested; requires explicit admin token, expiry, flag and separate temporary redeployment",
     "pdf_native_marking": "Implemented with SDK marked_pdf call, mock-only; actual annotation is unknown",
     "source_lens": "Verbatim source fragment highlight, page-aware original PDF navigation in browser; not the SDK native marked PDF",
     "repository": "debdutta1777/ripple-consequence-engine",
     "production_url": "https://ripple-consequence-engine.vercel.app/",
-    "release_commit": "5f93b5fa167e7efd4171d997e23aad2a5deaad63",
-    "production_deployment_id": "dpl_4R9pBSYatPqqagjnPAeTUrRtDSQY",
+    "release_commit": "469d3037f1271afead81f59ec0827ef6fcc994fb",
+    "production_deployment_id": "dpl_H9KNq6L65FEASvFkGDYQGv9ovzoY",
     "demo_video": "61-second synthetic UI walkthrough recorded offline at 1280x720, in /mnt/data/Ripple_Judge_Walkthrough.mp4, silent; not a live Clocked demo.",
     "live_http_route_checks": "Vercel deployment and alias verified; direct HTTP endpoint smoke on public domain not independently executed.",
     "browser_fullstack": "Chromium automation exercised live FastAPI TestClient handlers for /api/health /api/demo /api/parse-pdf /api/preview, including PDF upload and ambiguous-policy review, without Clocked calls",
     "ui_preview": "Implemented explicit offline deterministic preview of uploaded policy text (GPA and USD household income only), with unsupported requirements always marked review",
-    "production_deployment_prior": "Vercel reported READY and public alias for previous release e55ce411f889f48614f7b4640c0ece94213eaf96. New changes must deploy before being considered live.",
+    "production_deployment_prior": "Audit release commit 469d3037f1271afead81f59ec0827ef6fcc994fb READY Production and stable ripple-consequence-engine.vercel.app alias confirmed by Vercel deployment metadata. Direct production HTTP access through Vercel connector was denied.",
     "production_http_access": "Vercel web fetch denied by connector permissions; sandbox networking cannot resolve domain. Production HTTP routes not directly verified."
   },
   "blockers": [
@@ -57,7 +57,7 @@
     "External hackathon submission/receipt not confirmed."
   ],
   "next_actions": [
-    "Push latest audit fixes, await Vercel READY for the exact commit, verify stable alias.",
+    "Audit release 469d303 confirmed READY with public alias. Public HTTP checks remain blocked by Vercel connector authorization; owner can verify browser paths.",
     "Authorize an authenticated verifier execution using a temporary admin token configured only in Vercel, then record a genuine four-call synthetic result, keep request budget bounded and disable verification afterward.",
     "Verify public URL interactively from user browser if account connection cannot fetch production HTTP.",
     "Submit the public repo, production URL and actual demo recording to the organizer and save receipt."

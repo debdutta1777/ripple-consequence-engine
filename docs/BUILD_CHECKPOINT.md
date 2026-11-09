@@ -131,3 +131,5 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Ran isolated Chromium UI regression AND `scripts/fullstack_smoke.py`, which bridges Chromium interactions to real FastAPI TestClient handlers for PDF parsing, preview, and decision evidence. No external paid calls.
 - Real Clocked authentication still not demonstrated: key exists as Vercel Sensitive metadata, but verification requires separate temporary admin token; Vercel web fetch denies deployment access. Do not publish a successful live claim.
 - New source must be verified as Vercel READY after commit; do not conflate a prior production release with this new version.
+
+- Audit release `469d3037f1271afead81f59ec0827ef6fcc994fb` verified READY Production with stable `ripple-consequence-engine.vercel.app` alias via Vercel metadata; actual public HTTP fetch and authenticated Clocked request remain blocked by access permissions.
