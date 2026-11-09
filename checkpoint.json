@@ -1,7 +1,7 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 10,
-  "last_updated": "2026-11-09",
+  "checkpoint_version": 11,
+  "last_updated": "2026-11-10",
   "last_completed": "LP-01_production_ready",
   "current_phase": "P03.2_authenticated_clocked_validation",
   "completed_phases": [
@@ -56,18 +56,19 @@
     "real_clocked_auth": "NOT VERIFIED: restricted Vercel admin invocation and Sandbox (403)",
     "landing_public_url": "https://ripple-consequence-engine.vercel.app/",
     "studio_public_url": "https://ripple-consequence-engine.vercel.app/studio",
-    "actual_clocked_request": "Not performed: Vercel sandbox creation returns 403; protected HTTP access unavailable."
+    "actual_clocked_request": "NOT PERFORMED. 2026-11-10 retry after user-approved team access: Vercel project list empty; project read and environment metadata 404; deployment read 403; isolated sandbox creation 403. Do not infer credential validity.",
+    "vercel_access_recheck": "Authenticated connection lists team_gEVw9NDAwRlvIcSO9dSw8FA2 but no accessible Ripple project; user approved team access link, project grant remains unavailable."
   },
   "blockers": [
-    "Authenticated Clocked call not yet completed. Key exists as Sensitive in Vercel, but temporary Sandbox creation returned 403 and protected HTTP route cannot be invoked via this Vercel connection. Team authorization may need re-approval; do not bypass access by exposing a paid endpoint.",
     "Production HTTP requests cannot be confirmed through current Vercel connector: deployment fetch returns access denied. Vercel deployment metadata can still establish READY and public alias.",
     "Real Clocked response shapes and PDF markup remain unverified; no claim of real API integration success is justified.",
-    "External hackathon submission/receipt not confirmed."
+    "External hackathon submission/receipt not confirmed.",
+    "2026-11-10: Vercel connection requires Ripple project-level access, not just team SSO approval. Reauthorize/reconnect Vercel plugin and include ripple-consequence-engine; then run protected live smoke."
   ],
   "next_actions": [
-    "Owner approves temporary Vercel team connection access; then retry controlled private runner and single Clocked verification with synthetic data.",
-    "Upon verified authenticated SDK response, update integration results and test PDF annotated evidence.",
-    "Submit final hackathon entry and retain receipt."
+    "Reconnect Vercel plugin with access to team 'Debdutta Ghosh’s projects' AND project ripple-consequence-engine (project prj_11sd7D3kuloFFaUzH9tPivRLmpwT).",
+    "Confirm project list and secret metadata are accessible without decrypting secrets, then execute only the fixed fictional one-time Clocked smoke and record the actual response.",
+    "If Vercel grant still fails, use user-run scripts/smoke_clocked.py --run with their own local secret, never paste it in chat."
   ],
   "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
 }
