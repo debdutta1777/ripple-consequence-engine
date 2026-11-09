@@ -148,3 +148,14 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Vercel Production deployment `dpl_3LSXd6wkBCKeL7oZMgUn2YWGNKXX` reported **READY** with alias `ripple-consequence-engine.vercel.app`.
 - The studio is now `GET /studio`; synthetic preview is available on `GET /`. These routes passed local FastAPI and Chromium checks; hosted HTTP fetch access to protected Vercel environment remains restricted.
 - Authenticated Clocked still **not verified**. Attempted private Sandbox runner returned 403. No real Clocked calls used.
+
+
+### P03.2 — Real Clocked authenticated verification [COMPLETE; 2026-11-10]
+- The real Clocked SDK was authenticated using a GitHub Actions repository secret on a dedicated one-time test branch. No key was printed or committed.
+- Workflow run: https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42693887137 (job 129420472062), result **SUCCESS**.
+- Extract ×2 returned verified fictional thresholds: prior policy GPA **3.2**, maximum income **USD 50,000**; current policy GPA **3.5**, maximum income **USD 60,000**. All four extracted values matched expected fixtures exactly.
+- Compare returned verdict **conflicts** with **1** detected conflict. Rerank returned **4** results.
+- SDK-reported usage: **4 authenticated requests**, **24 credits**. No additional Clocked calls are claimed.
+- Corrected truncated `actions/checkout` pins on the main CI and manual Clocked workflows. Hosted GitHub CI succeeded after the change.
+- This completion covers *text-based* Extract/Compare/Rerank only. **Native PDF marked highlighting and arbitrary real policy rules remain unverified.** The public website still intentionally runs the credit-free deterministic preview.
+- Next: separately test Clocked's real annotated PDF response; confirm external hackathon submission receipt.
