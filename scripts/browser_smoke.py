@@ -13,7 +13,7 @@ from app.pdf_ingest import parse_policy_pdf
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "fixtures" / "screenshots"
 OUT.mkdir(parents=True, exist_ok=True)
-HTML = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+HTML = (ROOT / "web" / "studio.html").read_text(encoding="utf-8")
 HTML = HTML.replace('<link rel="stylesheet" href="/assets/styles.css" />', "")
 HTML = HTML.replace('<script src="/assets/app.js" defer></script>', "")
 CSS = (ROOT / "web" / "styles.css").read_text(encoding="utf-8")

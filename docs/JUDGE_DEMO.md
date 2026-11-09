@@ -2,7 +2,7 @@
 
 **Tagline:** Don't just compare what changed. Discover who it changes.
 
-**Setup:** Open the production URL in an ordinary browser. No account, real applicant data, or Clocked credits are required for the fictional interactive demo. Click **Guided tour** for the in-app narration.
+**Setup:** Open the production URL in an ordinary browser. No account, real applicant data, or Clocked credits are required for the fictional interactive demo. Start at the new landing page `/`, review the problem and click **Launch studio**. Within `/studio`, click **Guided tour** for the in-app narration.
 
 ## 0:00–0:20 — Explain the problem
 

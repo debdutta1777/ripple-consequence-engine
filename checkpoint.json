@@ -1,8 +1,8 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 8,
+  "checkpoint_version": 9,
   "last_updated": "2026-11-09",
-  "last_completed": "P07.3_deployed_audit_release",
+  "last_completed": "LP-01_local_qa",
   "current_phase": "P03.2_authenticated_clocked_validation",
   "completed_phases": [
     "P00",
@@ -15,7 +15,8 @@
     "P04.2-offline",
     "P05",
     "P06-offline",
-    "P06.5-offline"
+    "P06.5-offline",
+    "LP-01"
   ],
   "phases": {
     "P00": "complete",
@@ -26,7 +27,8 @@
     "P04": "partial_live_pdf_annotation_unverified",
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
-    "P07": "audit_release_deployed_submission_unconfirmed"
+    "P07": "audit_release_deployed_submission_unconfirmed",
+    "LP-01": "complete_local_ready_for_deployment"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -48,19 +50,22 @@
     "browser_fullstack": "Chromium automation exercised live FastAPI TestClient handlers for /api/health /api/demo /api/parse-pdf /api/preview, including PDF upload and ambiguous-policy review, without Clocked calls",
     "ui_preview": "Implemented explicit offline deterministic preview of uploaded policy text (GPA and USD household income only), with unsupported requirements always marked review",
     "production_deployment_prior": "Audit release commit 469d3037f1271afead81f59ec0827ef6fcc994fb READY Production and stable ripple-consequence-engine.vercel.app alias confirmed by Vercel deployment metadata. Direct production HTTP access through Vercel connector was denied.",
-    "production_http_access": "Vercel web fetch denied by connector permissions; sandbox networking cannot resolve domain. Production HTTP routes not directly verified."
+    "production_http_access": "Vercel web fetch denied by connector permissions; sandbox networking cannot resolve domain. Production HTTP routes not directly verified.",
+    "landing_local_qa": "Passed Chromium TestClient actual /api/demo interaction, 390/768/1024/1280/1440 widths, theme persistence toggles, no JS errors",
+    "landing_public_route": "GET / landing and GET /studio workspace implemented locally; production deploy pending",
+    "real_clocked_auth": "NOT VERIFIED: restricted Vercel admin invocation and Sandbox (403)"
   },
   "blockers": [
-    "Authenticated Clocked request not performed. Sensitive CLOCKED_API_KEY exists in Vercel but the app protects endpoints with a separate, short-lived admin verifier token. This session lacks an authorized invocation channel and cannot bypass it.",
+    "Authenticated Clocked call not yet completed. Key exists as Sensitive in Vercel, but temporary Sandbox creation returned 403 and protected HTTP route cannot be invoked via this Vercel connection. Team authorization may need re-approval; do not bypass access by exposing a paid endpoint.",
     "Production HTTP requests cannot be confirmed through current Vercel connector: deployment fetch returns access denied. Vercel deployment metadata can still establish READY and public alias.",
     "Real Clocked response shapes and PDF markup remain unverified; no claim of real API integration success is justified.",
     "External hackathon submission/receipt not confirmed."
   ],
   "next_actions": [
-    "Audit release 469d303 confirmed READY with public alias. Public HTTP checks remain blocked by Vercel connector authorization; owner can verify browser paths.",
-    "Authorize an authenticated verifier execution using a temporary admin token configured only in Vercel, then record a genuine four-call synthetic result, keep request budget bounded and disable verification afterward.",
-    "Verify public URL interactively from user browser if account connection cannot fetch production HTTP.",
-    "Submit the public repo, production URL and actual demo recording to the organizer and save receipt."
+    "Deploy landing page release and confirm Vercel READY with production alias.",
+    "Complete Vercel team-access approval and use a private short-lived verifier request to test actual Clocked Extract x2, Compare x1, Rerank x1; do not expose key or make paid endpoint public.",
+    "If verified, record sanitized SDK response shapes/usage and run native PDF evidence check.",
+    "Submit official challenge entry and retain receipt."
   ],
   "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
 }

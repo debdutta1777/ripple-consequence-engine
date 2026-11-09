@@ -19,3 +19,8 @@ This file should be updated only after an authenticated, controlled test has act
 - `CLOCKED_API_KEY` Sensitive Production existence verified from Vercel environment variable *metadata only*; actual decrypted secret not accessed.
 - Actual Clocked SDK request: **NOT EXECUTED**. Protected route requires short-lived administrator verifier secret. The connected Vercel deployment HTTP fetch returned authorization errors. This report must not claim success.
 - Production release metadata must be checked again after the audit fix commit. A previous release was READY at the stable alias; direct public HTTP route fetch from tools is blocked.
+
+
+## 2026-11-09 — Landing-page release, controlled authentication attempt
+- Attempted to create a short-lived Vercel Sandbox to invoke `/api/internal/verify-clocked` with its separate admin token while leaving the Clocked key server-side. Vercel responded **403 forbidden**: connection lacks sandbox-creation permission. No SDK call was sent and no Clocked credits were spent.
+- A Vercel team-access consent link is available, but its approval must be completed by the account owner. A successful SDK response is still required before changing integration verification status.

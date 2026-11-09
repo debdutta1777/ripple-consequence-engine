@@ -31,7 +31,7 @@ The backend implements Clocked's official Python SDK ([`clocked-sdk==0.7.0`](htt
 
 The **deterministic rule engine** in [`app/rules.py`](app/rules.py) computes the cohort outcomes. Clocked is not presented as a general policy-rule compiler. Read the precise [integration contract](docs/CLOCKED_INTEGRATION.md) and [live-verification status](docs/VERIFICATION_RESULTS.md).
 
-The public demonstration does **not** call the paid API. The owner's real `CLOCKED_API_KEY` lives in Vercel as a Sensitive Production environment variable, not in this repository. Real requests require an additional, short-lived admin-only verifier; the token cannot be obtained from the UI. In-process counters alone are not a safe global credit cap on Vercel.
+Visitors and judges **do not need user accounts or login**. Separately, Clocked itself requires an authenticated API key on the server. The public demonstration does **not** call the paid API. The owner's real `CLOCKED_API_KEY` lives in Vercel as a Sensitive Production environment variable, not in this repository. Real requests require an additional, short-lived admin-only verifier; the token cannot be obtained from the UI. In-process counters alone are not a safe global credit cap on Vercel.
 
 ## Local development
 
@@ -44,20 +44,24 @@ python -m pip install -r requirements-dev.txt
 python -m uvicorn app.main:app --reload
 ```
 
-Open http://127.0.0.1:8000/. Synthetic demo endpoints and all sliders work with **no API key**.
+Open http://127.0.0.1:8000/ for the landing page and http://127.0.0.1:8000/studio for the interactive workspace. Synthetic demo endpoints and all sliders work with **no API key**.
 
 ```bash
 python -m pytest -q
 node --check web/app.js
+node --check web/landing.js
 # Optional local browser smoke, if Chromium is installed:
 CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke
+CHROMIUM_PATH=/usr/bin/chromium python -m scripts.landing_smoke
 ```
 
 `pytest` uses mocked SDK responses, including missing-billing metadata and missing PDF annotations. Only a real protected Clocked invocation establishes the live contract. The test suite has **zero billable Clocked calls**. GitHub Actions runs an offline-only test workflow on commits.
 
 ## API routes
 
-- `GET /`, `GET /assets/*` — website, CSS/JS and fictional sample PDF files.
+- `GET /` — light-first public landing page, including a real interactive fictional policy preview.
+- `GET /studio` — complete interactive Ripple workspace with optional dark mode.
+- `GET /assets/*` — CSS/JS, favicon and fictional sample PDF files.
 - `GET /api/demo` — deterministic fictional cohort; no Clocked calls.
 - `GET /api/health` — safe health status; public live mode deliberately disabled.
 - `POST /api/parse-pdf` — request-only constrained PDF text extraction; no Clocked calls.

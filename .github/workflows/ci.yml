@@ -22,4 +22,6 @@ jobs:
       - name: Run offline unit tests
         run: python -m pytest -q
       - name: Check browser JavaScript syntax
-        run: node --check web/app.js
+        run: |
+          node --check web/app.js
+          node --check web/landing.js

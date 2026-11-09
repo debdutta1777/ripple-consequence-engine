@@ -133,3 +133,12 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - New source must be verified as Vercel READY after commit; do not conflate a prior production release with this new version.
 
 - Audit release `469d3037f1271afead81f59ec0827ef6fcc994fb` verified READY Production with stable `ripple-consequence-engine.vercel.app` alias via Vercel metadata; actual public HTTP fetch and authenticated Clocked request remain blocked by access permissions.
+
+
+### LP-01 — Public landing page [implemented locally; deploy pending 2026-11-09]
+- Split `GET /` into a complete light-first landing page; preserved existing interactive studio at `GET /studio` without login. Both share theme preference, with light mode as default.
+- Added interactive 2025/2026 policy preview driven by the real fictional `/api/demo` endpoint, not hardcoded impact data or paid Clocked calls.
+- Created responsive illustrations, feature explanations, evidence example, source-code link, accessible navigation, reduced-motion support and app favicon.
+- Repointed offline Chromium and demo recording to `web/studio.html`; added `scripts/landing_smoke.py` and assertions in route tests.
+- Re-ran unit suite and browser checks (see release receipt). No real Clocked request was made in these tests.
+- Vercel sandbox-backed secure HTTP verification was attempted but failed with **403 forbidden** to create sandbox; an alternative authorized invocation channel remains necessary to call protected Clocked endpoint. The Sensitive Production key exists but was not decrypted or copied.

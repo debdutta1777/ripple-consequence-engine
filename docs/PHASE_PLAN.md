@@ -7,6 +7,7 @@ One checkpoint per completed phase; code and status must be committed together. 
 | P00 | Starter audit | Complete | Reused synthetic data and found project gaps |
 | P01 | Project checkpoints + secret safety | Complete | `checkpoint.json`, human logs, safe environment setup |
 | P02 | Decision Flip Explorer | Complete | Exact two-rule counterfactual, evidence buttons, unit tests |
+| LP-01 | Public landing page | Complete, local browser QA | Marketing overview, interactive fiction preview, mobile/dark checks; public deployment pending |
 | UI-01 | Light-first redesign | Complete | User confirmed Vercel site; saved dark-mode toggle, responsive tests |
 | P03.1 | Secure Clocked secret metadata | Complete | Sensitive Production key confirmed without decryption |
 | P03.1b | Credit safety + telemetry | Complete | Public paid route gated; credits only from SDK metadata |

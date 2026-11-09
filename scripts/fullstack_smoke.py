@@ -38,7 +38,7 @@ def main():
         page.expose_binding('__realApi',bridge)
         # The browser is network-isolated, but every response comes from the real
         # FastAPI TestClient, not a fake fixture or canned JSON.
-        html=(ROOT/'web/index.html').read_text(encoding='utf-8')
+        html=(ROOT/'web/studio.html').read_text(encoding='utf-8')
         html=html.replace('<link rel="stylesheet" href="/assets/styles.css" />','')
         html=html.replace('<script src="/assets/app.js" defer></script>','')
         page.set_content(html)

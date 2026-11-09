@@ -64,6 +64,11 @@ def live_ready() -> bool:
 def index():
     return FileResponse(ROOT / "web" / "index.html")
 
+
+@app.get("/studio")
+def studio():
+    return FileResponse(ROOT / "web" / "studio.html")
+
 @app.get("/api/health")
 def health():
     return {"status": "ok", "live_enabled": False, "demo_only": True, "version": "0.9.0"}

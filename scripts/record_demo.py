@@ -14,7 +14,7 @@ from app.pdf_ingest import parse_policy_pdf
 ROOT = Path(__file__).resolve().parent.parent
 OUT = Path(os.environ.get('RIPPLE_VIDEO_OUT', str(ROOT / 'fixtures' / 'demo-video')))
 OUT.mkdir(parents=True, exist_ok=True)
-HTML = (ROOT / 'web' / 'index.html').read_text(encoding='utf-8')
+HTML = (ROOT / 'web' / 'studio.html').read_text(encoding='utf-8')
 HTML = HTML.replace('<link rel="stylesheet" href="/assets/styles.css" />', '')
 HTML = HTML.replace('<script src="/assets/app.js" defer></script>', '')
 CSS = '\n'.join(s for s in (ROOT / 'web/styles.css').read_text(encoding='utf-8').splitlines() if not s.startswith('@import '))

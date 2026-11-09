@@ -24,7 +24,15 @@ def test_live_requires_opt_in(monkeypatch):
 
 def test_root_and_assets_served():
     client = TestClient(app)
-    assert client.get('/').status_code == 200
+    landing = client.get('/')
+    assert landing.status_code == 200
+    assert 'A single rule can' in landing.text
+    assert 'href="/studio"' in landing.text
+    studio = client.get('/studio')
+    assert studio.status_code == 200
+    assert 'Decision flips' in studio.text
+    assert client.get('/assets/landing.css').status_code == 200
+    assert client.get('/assets/landing.js').status_code == 200
     assert client.get('/assets/styles.css').status_code == 200
     assert client.get('/assets/app.js').status_code == 200
 
