@@ -10,3 +10,7 @@
 
 .proof-handoff{margin:26px 0 0;display:flex;align-items:center;gap:17px;border-radius:14px;padding:18px 22px;border:1px solid var(--line);background:var(--surface)}.proof-handoff .proof-icon{font-size:18px;color:var(--green);background:var(--green-bg);width:38px;height:38px;display:grid;place-items:center;border-radius:50%;flex-shrink:0}.proof-handoff>div{flex:1}.proof-handoff strong{font-size:12px}.proof-handoff p{font-size:10px;line-height:1.7;color:var(--muted);margin:6px 0 0}.proof-handoff a{font-size:11px;color:var(--accent);font-weight:800;white-space:nowrap}
 @media(max-width:700px){.proof-handoff{align-items:start;flex-wrap:wrap;padding:16px}.proof-handoff a{margin-left:55px}}
+
+/* TRY-02: Enter directly into the upload workspace, without a second landing hero. */
+.workspace{padding-top:52px}.section-top h1{font-size:clamp(27px,3.15vw,38px);letter-spacing:-1.5px;line-height:1.2;margin:0 0 11px;font-weight:800}.section-side{display:flex;align-items:center;justify-content:flex-end;gap:11px;flex-wrap:wrap}.section-side .button{padding:10px 14px;min-height:40px}.section-side .pill{margin:0}
+@media(max-width:700px){.workspace{padding-top:30px}.section-side{justify-content:flex-start;margin-top:20px}.section-side .pill{margin:0}.section-top h1{font-size:29px;letter-spacing:-1px}}

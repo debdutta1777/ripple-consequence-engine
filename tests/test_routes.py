@@ -29,6 +29,9 @@ def test_root_and_assets_served():
     assert 'A single rule can' in landing.text
     assert 'href="/studio"' in landing.text
     assert 'href="/try"' in landing.text
+    assert 'Explore Demo' in landing.text
+    assert 'Try It Yourself' in landing.text
+    assert landing.text.index('href="/studio"') < landing.text.index('href="/try"')
     studio = client.get('/studio')
     assert studio.status_code == 200
     assert 'Decision flips' in studio.text

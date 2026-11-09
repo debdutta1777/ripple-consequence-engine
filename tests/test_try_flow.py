@@ -8,6 +8,11 @@ def test_self_service_page_and_assets():
     client = TestClient(app)
     response = client.get('/try')
     assert response.status_code == 200
+    assert '<main id="main" class="wrap">\n  <section class="workspace"' in response.text
+    assert '<h1 id="workspace-title">Upload your policy versions</h1>' in response.text
+    assert 'Your policies.<br/>' not in response.text
+    assert 'Start an analysis' not in response.text
+    assert 'Use sample PDFs' in response.text
     assert 'Upload previous policy' in response.text
     assert 'Upload updated policy' in response.text
     assert client.get('/assets/try.css').status_code == 200

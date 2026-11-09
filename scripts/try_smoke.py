@@ -52,6 +52,9 @@ def main():
         if os.getenv('CHROMIUM_PATH'):opts['executable_path']=os.environ['CHROMIUM_PATH']
         browser=p.chromium.launch(**opts)
         page=open_try(browser,client,1440,errors)
+        assert page.locator('main > section').first.get_attribute('id')=='workspace'
+        assert page.locator('#workspace h1').inner_text()=='Upload your policy versions'
+        assert page.locator('.intro').count()==0
         assert page.locator('#previous-drop').count()==1
         assert page.locator('#updated-drop').count()==1
         page.locator('#load-samples-top').click()

@@ -47,7 +47,12 @@ def main():
         assert desk.locator('#landing-theme').get_attribute('aria-label')=='Switch to light mode'
         desk.locator('#landing-theme').click()
         assert desk.evaluate('document.documentElement.dataset.theme')=='light'
-        assert desk.locator('.lp-nav-cta').get_attribute('href')=='/try'
+        assert desk.locator('.lp-nav-cta').get_attribute('href')=='/studio'
+        assert desk.locator('.lp-hero-actions a').count()==2
+        assert desk.locator('.lp-hero-actions a').nth(0).get_attribute('href')=='/studio'
+        assert desk.locator('.lp-hero-actions a').nth(1).get_attribute('href')=='/try'
+        assert desk.locator('.lp-hero-actions a').nth(0).inner_text().startswith('Explore Demo')
+        assert desk.locator('.lp-hero-actions a').nth(1).inner_text().startswith('Try It Yourself')
         assert desk.evaluate('document.documentElement.scrollWidth')<=1440
         desk.evaluate("document.documentElement.style.scrollBehavior='auto';window.scrollTo(0,0)")
         desk.wait_for_timeout(150)
