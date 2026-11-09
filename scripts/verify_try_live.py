@@ -74,12 +74,14 @@ def run() -> dict:
         raise RuntimeError("CLOCKED_API_KEY Actions secret is not configured")
     payloads = {name: path.read_bytes() for name, path in FILES}
 
+    print("STAGE: public PDF upload")
     # Verify the public Try It Yourself endpoints, not only a TestClient mock.
     remote = {name: post_pdf(path) for name, path in FILES}
     local = {name: parse_policy_pdf(payloads[name]) for name, _ in FILES}
     for name in local:
         if remote[name]["text"] != local[name]["text"] or remote[name]["page_count"] != 1:
             raise ValueError(f"Public PDF extraction mismatch for {name}")
+    print("STAGE: public PDF extraction passed; evaluating policies")
     deployed_result = post_preview(remote["previous"]["text"], remote["updated"]["text"])
     local_result = preview_policies(local["previous"]["text"], local["updated"]["text"], APPLICANTS)
     if deployed_result["mode"] != "offline" or policies_tuple(deployed_result) != EXPECTED_RULES:
@@ -87,6 +89,7 @@ def run() -> dict:
     if deployed_result["impact"]["counts"] != EXPECTED_COUNTS or local_result["impact"]["counts"] != EXPECTED_COUNTS:
         raise ValueError("Applicant transition counts do not match the fresh PDFs")
 
+    print("STAGE: public two-PDF preview passed; invoking Clocked")
     # Same documents, separate controlled paid Clocked call: do not label the
     # public endpoint as Clocked-powered, as it explicitly uses local rules.
     from clocked_sdk import Clocked
@@ -94,6 +97,7 @@ def run() -> dict:
         live = analyze_live(client, remote["previous"]["text"], remote["updated"]["text"], APPLICANTS)
         zip_bytes, manifest = create_marked_comparison(client, payloads["previous"], payloads["updated"])
 
+    print("STAGE: Clocked SDK calls returned; checking evidence")
     if policies_tuple(live) != EXPECTED_RULES:
         raise ValueError("Real Clocked extraction did not match policy text")
     if live["impact"]["counts"] != EXPECTED_COUNTS:
@@ -101,6 +105,7 @@ def run() -> dict:
     if not live["comparison"].get("verdict") or not live.get("relevance"):
         raise ValueError("Clocked Compare or Rerank returned insufficient evidence")
 
+    print("STAGE: Clocked extracted rules and applicant impacts match")
     artifact_dir = Path("try-live-proof")
     artifact_dir.mkdir(exist_ok=True)
     annotations = {}
@@ -156,5 +161,16 @@ if __name__ == "__main__":
         print("SDK reported credits:", result["sdk_credits_text"], "+", result["sdk_credits_pdf"])
     except Exception as exc:
         # Never include upstream exception messages or secrets in public logs.
-        print("FAIL: verification error type:", type(exc).__name__)
+        messages = {
+            "Deployed PDF parser did not return 200", "Public PDF extraction mismatch for previous",
+            "Public PDF extraction mismatch for updated", "Deployed preview did not return 200",
+            "Public Try It Yourself preview produced unexpected thresholds",
+            "Applicant transition counts do not match the fresh PDFs",
+            "Real Clocked extraction did not match policy text",
+            "Real Clocked-derived impact differs from public deterministic preview",
+            "Clocked Compare or Rerank returned insufficient evidence",
+            "Clocked did not return any annotated PDFs",
+        }
+        message = str(exc)
+        print("FAIL:", message if message in messages else type(exc).__name__)
         sys.exit(1)
