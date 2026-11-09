@@ -1,26 +1,46 @@
 # Actual Clocked API verification results
 
-**Status: NOT YET VERIFIED.** The `CLOCKED_API_KEY` Vercel variable has been confirmed as a Sensitive Production secret by metadata, but no authenticated SDK response is established by the current local test suite.
+**Status: VERIFIED for the fictional text and annotated-PDF fixtures.**
+Public visitor analysis remains intentionally credit-free and is **not** a live Clocked workflow. Live results below come from authenticated, isolated GitHub Actions jobs using a repository Actions secret. No API key was printed or committed.
 
-- Requests paid by this repository's development tests: **0** (all tests are offline and mock-dependent).
-- Intended controlled run: Extract ×2, Compare ×1, Rerank ×1 = four SDK requests.
-- Optional separate PDF highlight test: Compare PDF ×1.
-- Billing values: unknown until the actual SDK reports them.
-- Do **not** interpret a local `FakeClocked` test as production Clocked verification.
+## P03.2 — Live text analysis (2026-11-10 IST)
 
-This file should be updated only after an authenticated, controlled test has actually succeeded. If the test fails, record the failure and recommended remediation instead.
+- [Successful workflow run 42693887137](https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42693887137).
+- **Four authenticated SDK requests:** Extract ×2, Compare ×1, Rerank ×1.
+- Previous policy: minimum GPA **3.2**, maximum household income **USD 50,000**.
+- Current policy: minimum GPA **3.5**, maximum household income **USD 60,000**.
+- All four extracted thresholds matched the fictional source documents exactly.
+- Compare verdict: `conflicts`, with **1** conflict. Rerank returned **4** results.
+- SDK-reported usage: **24 credits**.
 
-## Full release audit — 2026-11-09
+## P04 — Native annotated PDF Compare (2026-11-10 IST)
 
-- `python -m pytest -q`: **45 passed**.
-- `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`: **PASS**, isolated mock API browser test.
-- `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.fullstack_smoke`: **PASS**, browser events routed through actual local FastAPI TestClient handlers, with successful PDF parse and strict offline preview.
-- `node --check web/app.js`: **PASS**.
-- `CLOCKED_API_KEY` Sensitive Production existence verified from Vercel environment variable *metadata only*; actual decrypted secret not accessed.
-- Actual Clocked SDK request: **NOT EXECUTED**. Protected route requires short-lived administrator verifier secret. The connected Vercel deployment HTTP fetch returned authorization errors. This report must not claim success.
-- Production release metadata must be checked again after the audit fix commit. A previous release was READY at the stable alias; direct public HTTP route fetch from tools is blocked.
+- [Successful workflow run 42695749607](https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42695749607), job **129427019985**.
+- **One authenticated Clocked Compare request**, using only bundled fictional `web/samples/previous-policy.pdf` and `updated-policy.pdf`, SDK `return_pdf="highlight"`, `return_text=True`.
+- Compare verdict: `conflicts`; **1** conflict.
+- SDK-reported usage: **9 credits**, **USD 0.001793**, **200.551425 ms model time**.
+- The previous PDF contained **1** genuine PDF `/Highlight` annotation; the current PDF contained **4**. Both outputs were valid single-page PDFs and retained their original policy text.
+- Verified SHA-256, previous marked PDF: `79a2aa9689cf48b5692b9b275301cd6a374c8a893a92c95b7594cf92e0d43a75`.
+- Verified SHA-256, current marked PDF: `fb13c095ddf0ca4d12a39d5788d855076dcd34ed6af0a317655abfdd8c6f47fa`.
+- GitHub Actions artifact `ripple-real-clocked-pdf-proof` (artifact ID `13707534934`) contains the **actual annotated PDFs** and `verification-report.json`. Retention expires **2026-11-16**.
+- The artifact was downloaded, inspected with `pypdf`, and the marked PDF was rendered for visual QA. All five annotations were `/Highlight` objects; the current PDF's four lines were visibly highlighted.
+- The verified request uses `scripts/verify_clocked_pdf.py`. The corresponding workflow is available on `main` as **manual-only** `.github/workflows/verify-clocked-pdf.yml`, preventing automatic paid runs.
 
+## Credit summary
 
-## 2026-11-09 — Landing-page release, controlled authentication attempt
-- Attempted to create a short-lived Vercel Sandbox to invoke `/api/internal/verify-clocked` with its separate admin token while leaving the Clocked key server-side. Vercel responded **403 forbidden**: connection lacks sandbox-creation permission. No SDK call was sent and no Clocked credits were spent.
-- A Vercel team-access consent link is available, but its approval must be completed by the account owner. A successful SDK response is still required before changing integration verification status.
+| Verified activity | Authenticated calls | SDK-reported credits |
+|---|---:|---:|
+| Text Extract/Compare/Rerank | 4 | 24 |
+| Native PDF Compare/Highlight | 1 | 9 |
+| **Total** | **5** | **33** |
+
+## Scope and remaining limitations
+
+- These successes verify real Clocked authentication, text extraction, cross-document comparison, relevance reranking, and SDK-native marked PDF output **on fictional fixtures**.
+- They do **not** prove correct handling of arbitrary uploaded policy documents, exceptions, scanned PDFs, or a public live Clocked analysis flow.
+- The public site at `https://ripple-consequence-engine.vercel.app/` still uses its deterministic offline preview. Its source navigation is not presented as an SDK-native annotated PDF.
+- The official hackathon submission/receipt remains unconfirmed. No sensitive credential is included in the proof artifact.
+
+## Earlier offline quality checks
+
+Before live verification, 45 backend tests, Javascript syntax checks, and desktop/mobile Chromium tests were recorded as passed. Those checks alone did not authenticate with Clocked. GitHub's offline CI subsequently passed after fixing the pinned `actions/checkout` SHA.
