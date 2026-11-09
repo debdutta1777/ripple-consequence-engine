@@ -171,3 +171,14 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Combined authenticated requests across the text and PDF smoke tests: **5 requests, 33 SDK-reported credits**.
 - This verifies **native PDF output for fictional text-based PDFs only**. It does not enable public live analysis, support scanned PDFs, or prove arbitrary uploaded policies are interpreted correctly.
 - Primary remaining non-code task: **submit Ripple to the hackathon and retain the official receipt**.
+
+### TRY-01 — User-provided policy PDF analysis workflow [COMPLETE; 2026-11-10]
+- New public `/try` self-service interface. The landing page `/` and fictional Impact Studio `/studio` remain available, with light mode default and optional dark mode.
+- Inspiration: supplied screenshots of AuditEase's staged contract/regulation analysis and reporting, without copying branding or claiming to have watched the inaccessible YouTube video.
+- Upload previous and updated selectable-text PDFs, maximum 2 MB and 12 pages each. Actual FastAPI `/api/parse-pdf` extracts temporary text with page mappings; progress stages correspond to completed processing operations.
+- Results combine literal line differences (`app/policy_diff.py`) and transparent GPA/annual USD income rule evaluation (`/api/preview`). Charts show gains, losses, retained, excluded, and review; includes clause ledger, filters, evidence, original PDF source links, and CSV export.
+- Without roster data, UI clearly identifies 16 fictional applicants; user may upload an `id,name,gpa,income` CSV with up to 100 cases. Counts then reflect only that selected roster.
+- Unsupported restrictions and ambiguous rules show Needs review. OCR and broad legal compliance remain unsupported. Public `/try` uses zero Clocked credits; real SDK text and PDF highlighting were separately verified on fictional fixtures in phases P03.2 and P04.3.
+- QA: 50 backend tests passed. Chromium against actual FastAPI handlers covered PDF parsing, sample and uploaded CSV cohorts (4 lost/4 gained and 1 lost/1 gained respectively), charts, source evidence, download, theme, and mobile widths. Existing landing, Studio and full-stack checks passed.
+- Release commit `84d9b454fa8b2b305f464c7c2a1e77816d46f867`; CI pin restored at `e1f089907d1ffdbce17858e59f1d3c8e4b615faf`; hosted CI run `42702622581` succeeded.
+- Documentation in `docs/TRY_IT_YOURSELF.md`. No API keys in source. Official hackathon submission still unconfirmed.
