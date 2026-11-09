@@ -1,9 +1,9 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 12,
+  "checkpoint_version": 13,
   "last_updated": "2026-11-10",
-  "last_completed": "LP-01_production_ready",
-  "current_phase": "P03.2_authenticated_clocked_validation_blocked_on_private_invocation",
+  "last_completed": "P03.2_authenticated_clocked_validation",
+  "current_phase": "P04_live_pdf_highlight_validation_pending",
   "completed_phases": [
     "P00",
     "P01",
@@ -16,14 +16,15 @@
     "P05",
     "P06-offline",
     "P06.5-offline",
-    "LP-01"
+    "LP-01",
+    "P03.2"
   ],
   "phases": {
     "P00": "complete",
     "P01": "complete",
     "P02": "complete",
     "UI-01": "complete",
-    "P03": "in_progress_live_clocked_unverified",
+    "P03": "complete_for_text_extract_compare_rerank; broader document cases not yet verified",
     "P04": "partial_live_pdf_annotation_unverified",
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
@@ -34,7 +35,7 @@
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
     "javascript": "node --check web/app.js passed",
     "chromium_smoke": "Passed offline for light/dark theme, case cards, consequence paths, Rule Lab slider and presets, SVG keyboard navigation, guided tour, PDF preview, evidence source lens, HTML proof download and 390-1440px breakpoints",
-    "live_clocked_calls": false,
+    "live_clocked_calls": true,
     "clocked_secret_metadata": "Sensitive Production CLOCKED_API_KEY existence confirmed without decrypting (no secret read)",
     "public_deployment": "Vercel reported audit release 469d3037f1271afead81f59ec0827ef6fcc994fb as READY production, with stable alias ripple-consequence-engine.vercel.app.",
     "demo_no_paid_requests": true,
@@ -53,22 +54,25 @@
     "production_http_access": "Vercel web fetch denied by connector permissions; sandbox networking cannot resolve domain. Production HTTP routes not directly verified.",
     "landing_local_qa": "Passed Chromium TestClient actual /api/demo interaction, 390/768/1024/1280/1440 widths, theme persistence toggles, no JS errors",
     "landing_public_route": "GitHub 1167550c47b6aa67332e9afe12e531023b82e421 Vercel deployment dpl_3LSXd6wkBCKeL7oZMgUn2YWGNKXX READY production with stable alias ripple-consequence-engine.vercel.app. Direct HTTP response not independently fetched.",
-    "real_clocked_auth": "NOT VERIFIED: restricted Vercel admin invocation and Sandbox (403)",
+    "real_clocked_auth": "PASS: GitHub Actions workflow run 42693887137, job 129420472062, 2026-11-10 IST. Exact fictional scholarship thresholds matched expected. Clocked Extract x2, Compare x1, Rerank x1.",
     "landing_public_url": "https://ripple-consequence-engine.vercel.app/",
     "studio_public_url": "https://ripple-consequence-engine.vercel.app/studio",
-    "actual_clocked_request": "NOT PERFORMED. Vercel project/secret metadata accessible; temporary verifier enabled in production with separate sensitive token and expiration; attempted private request invocation blocked by tool safety checks before a request was sent. ENABLE_VERIFICATION set false and RIPPLE_VERIFY_UNTIL set 0; secure production redeployment dpl_6UNUeq5mRMGHeRSjSW6kxjnxFg47 READY. No success claimed.",
+    "actual_clocked_request": "PASS: real Clocked SDK authenticated in GitHub Actions using repository secret (not disclosed): prior GPA 3.2, income USD 50000; current GPA 3.5, income USD 60000; Compare verdict conflicts (1), Rerank returned 4 items; SDK credits 24 across 4 calls.",
     "vercel_access_recheck": "Vercel project accessible; Sensitive CLOCKED_API_KEY present (metadata only); isolated sandbox execution works but does not inherit Production secrets.",
-    "verifier_cleanup": "Temporary settings set to ENABLE_VERIFICATION=false and RIPPLE_VERIFY_UNTIL=0. Production deployment dpl_6UNUeq5mRMGHeRSjSW6kxjnxFg47 READY with public alias. Temporary runner cleanup requested."
+    "verifier_cleanup": "Temporary settings set to ENABLE_VERIFICATION=false and RIPPLE_VERIFY_UNTIL=0. Production deployment dpl_6UNUeq5mRMGHeRSjSW6kxjnxFg47 READY with public alias. Temporary runner cleanup requested.",
+    "clocked_live_workflow_run_url": "https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42693887137",
+    "clocked_billed_credits_for_test": 24,
+    "clocked_live_pdf_annotations": "UNVERIFIED: no live PDF highlighting request has been made."
   },
   "blockers": [
-    "Actual authenticated Clocked verification remains unperformed: protected private HTTP invocation was blocked by execution safety checks; no live response exists.",
-    "The production Clocked API key is stored in Vercel, but cannot be used from an isolated sandbox without explicitly and securely transferring it; do not decrypt it.",
-    "External hackathon submission receipt is not confirmed."
+    "Live PDF highlighting and custom uploaded documents remain unverified; do not imply text smoke covers them.",
+    "The public production site still intentionally uses offline analysis for users; live text SDK calls were verified in GitHub Actions, not through the public frontend.",
+    "External hackathon submission/receipt not confirmed."
   ],
   "next_actions": [
-    "Run private test using trusted server-side operator channel or a GitHub Actions workflow with a separately configured GitHub Actions secret, never exposing a key in logs or chat.",
-    "Record real Extract ×2, Compare ×1, Rerank ×1 response, SDK reported usage and any parsing mismatches; only then mark live Clocked verified.",
-    "Disable any verification gates after tests and confirm production READY; submit organizer entry."
+    "Verify native PDF Compare/highlight with one separately authorized restricted GitHub Actions job; inspect authentic marked PDF output.",
+    "After any required parsing adjustments, repeat local and hosted CI and update checkpoints.",
+    "Prepare and submit organizer entry and keep submission receipt; no API secrets in GitHub source."
   ],
-  "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
+  "notes": "2026-11-10 real Clocked text integration verified: 4 successful authenticated requests consumed SDK-reported 24 credits. Previous failures were CI setup action SHA pin issues, now corrected on main; verify CI run."
 }
