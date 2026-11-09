@@ -107,3 +107,17 @@ The separately delivered `Ripple_Judge_Walkthrough.mp4` is a 61-second visual de
 The public **Preview policy changes** action updates the fictional cohort using the user's uploaded or pasted policy texts without an external Clocked request. It supports only **one explicitly worded minimum GPA and one USD annual household-income ceiling per document**. Unknown rules, extra requirements and ambiguities produce **Needs review**. This heuristic is not Clocked extraction; do not represent its results as authenticated API evidence. Run `python -m pytest -q` (45 passing tests) and `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.fullstack_smoke` to exercise the real FastAPI handlers through the browser without paid calls.
 
 For actual authenticated Clocked verification, follow `docs/SECURE_API_SETUP.md`: temporary privately configured verifier, controlled requests against fictional policy data, then immediate disablement. No real response has been confirmed yet.
+
+
+### Fresh two-PDF QA scenario (November 2026)
+
+The public **[Try It Yourself](https://ripple-consequence-engine.vercel.app/try)** workflow accepts your own previous and updated selectable-text policy PDFs. The page includes a second, newly authored fictional 2025/2026 QA pair:
+
+- `web/samples/judge-policy-2025.pdf`: minimum cumulative GPA **3.25**, maximum annual USD household income **$52,000**.
+- `web/samples/judge-policy-2026.pdf`: minimum GPA **3.65**, maximum income **$66,000**.
+
+Choose **Load this pair** or download the files and upload them manually. On Ripple's 16-person *fictional* cohort, the transparent local rule model reports 4 lost eligibility, 2 gained, 2 remained eligible and 8 remained ineligible. You may also upload your own applicant CSV to replace this sample cohort. Results that require unsupported conditions are flagged for review.
+
+Animations reflect actual progression through the upload and preview steps. The report includes a comparison summary, source-linked case explanations, an outcome chart, CSV export and print view. Design process notes are in `docs/VIDEO_UI_REVIEW.md`.
+
+**Important:** `/try` uses real server-side PDF parsing but a deliberately credit-free deterministic rule model. The same exact QA policies are independently tested against genuine, authenticated Clocked Extract/Compare/Rerank and native PDF highlights in the manual `scripts/verify_try_live.py` verification job. Do not mistake a local `/api/preview` result for a Clocked request. No API keys are included in source files.

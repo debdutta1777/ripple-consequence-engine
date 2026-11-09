@@ -86,6 +86,25 @@ def main():
             assert page.locator('#metric-lost').inner_text()=='1'
             assert page.locator('#metric-gained').inner_text()=='1'
             assert 'uploaded CSV' in page.locator('#analysis-notice').inner_text()
+        # Fresh PDFs go through the exact same document upload controls and FastAPI handlers.
+        page.locator('input[name="cohort-mode"][value="sample"]').check()
+        page.locator('#previous-file').set_input_files(str(ROOT/'web'/'samples'/'judge-policy-2025.pdf'))
+        page.locator('#updated-file').set_input_files(str(ROOT/'web'/'samples'/'judge-policy-2026.pdf'))
+        page.locator('#start-analysis').click()
+        page.wait_for_function("document.getElementById('rule-new-gpa').textContent==='3.65'",timeout=25000)
+        assert page.locator('#metric-total').inner_text()=='16'
+        assert page.locator('#metric-lost').inner_text()=='4'
+        assert page.locator('#metric-gained').inner_text()=='2'
+        assert page.locator('#metric-review').inner_text()=='0'
+        assert page.locator('#rule-old-gpa').inner_text()=='3.25'
+        assert page.locator('#rule-old-income').inner_text()=='$52,000'
+        assert page.locator('#rule-new-income').inner_text()=='$66,000'
+        assert page.locator('#progress-percent').inner_text()=='100%'
+        assert page.locator('#scan-progress-track').get_attribute('aria-valuenow')=='100'
+        assert '4 lose eligibility. 2 gain it.' in page.locator('#insight-headline').inner_text()
+        assert page.locator('#print-results').is_visible()
+        page.locator('[data-filter="gained"]').click()
+        assert page.locator('#case-rows tr').count()==2
         page.locator('#theme-toggle').click()
         assert page.evaluate('document.documentElement.dataset.theme')=='dark'
         page.locator('#theme-toggle').click()

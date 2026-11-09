@@ -57,11 +57,11 @@
     target.addEventListener('drop', evt => {const f = evt.dataTransfer?.files?.[0]; if(f)setFile(kind,f);});
   }
 
-  async function loadSamples() {
+  async function loadSamples(names = ['previous-policy.pdf', 'updated-policy.pdf']) {
     if (state.busy) return;
     clearError();
     try {
-      const files = await Promise.all([['previous','previous-policy.pdf'],['updated','updated-policy.pdf']].map(async ([kind,name]) => {
+      const files = await Promise.all([['previous',names[0]],['updated',names[1]]].map(async ([kind,name]) => {
         const r = await fetch(`/assets/samples/${name}`, {cache:'no-store'});
         if (!r.ok) throw new Error('Example PDFs could not be loaded.');
         const blob = await r.blob();
@@ -69,10 +69,11 @@
       }));
       files.forEach(([kind,file]) => setFile(kind,file));
       $('#workspace').scrollIntoView({behavior:'smooth',block:'start'});
-      notify('Fictional 2025 and 2026 policies are ready to analyze.');
+      notify('Both fictional policy documents are ready to analyze.');
     } catch(e) {error(e.message);}
   }
-  $('#load-samples-top').addEventListener('click', loadSamples);
+  $('#load-samples-top').addEventListener('click', () => loadSamples());
+  $('#load-judge-samples').addEventListener('click', () => loadSamples(['judge-policy-2025.pdf','judge-policy-2026.pdf']));
 
   function selectedCohortMode() {return $('input[name="cohort-mode"]:checked')?.value || 'sample';}
   $$('input[name="cohort-mode"]').forEach(node => node.addEventListener('change', () => {
@@ -129,6 +130,12 @@
     }catch(e){$('#cohort-status').textContent = e.message;error(e.message);}
   });
 
+  function progress(percent, label) {
+    $('#scan-progress-fill').style.width = `${percent}%`;
+    $('#progress-percent').textContent = `${percent}%`;
+    $('#progress-phase').textContent = label;
+    $('#scan-progress-track').setAttribute('aria-valuenow', String(percent));
+  }
   function step(index,status) {
     const rows = $$('.scan-steps li');
     rows.forEach((item,i)=>{
@@ -138,6 +145,8 @@
     });
     const heads=['Reading previous document','Reading updated document','Comparing rules and clauses','Calculating cohort consequences'];
     $('#processing-title').textContent = heads[Math.min(index,3)];
+    const values=[10,37,64,86];
+    progress(status==='done' ? 100 : values[Math.min(index,3)], status==='done' ? 'ANALYSIS COMPLETE' : ['READING PREVIOUS PDF','READING UPDATED PDF','COMPARING SOURCE TEXT','MODELING APPLICANTS'][Math.min(index,3)]);
   }
   const delay = ms => new Promise(resolve=>setTimeout(resolve,ms));
   async function parsePdf(kind) {
@@ -156,7 +165,7 @@
     clearError();
     if(!state.files.previous || !state.files.updated){error('Upload both the previous and the updated policy PDFs first, or load the fictional sample PDFs.');return;}
     if(selectedCohortMode()==='csv' && (!state.cohort || !state.cohort.length)){error('Choose a valid applicant CSV or select the fictional 16-person sample cohort.');return;}
-    state.busy=true;$('#start-analysis').disabled=true;$('#results').hidden=true;$('#processing').hidden=false;
+    state.busy=true;$('#start-analysis').disabled=true;$('#results').hidden=true;$('#processing').hidden=false;document.body.classList.add('is-analyzing');progress(0,'QUEUED');
     $('#processing').scrollIntoView({behavior:'smooth',block:'start'});
     try {
       step(0,'running'); const old = await parsePdf('previous');state.parsed.previous=old;await delay(180);step(1,'running');
@@ -172,9 +181,10 @@
       notify('Analysis completed using your selected documents.');
     }catch(err){
       $('#processing').hidden=true;error(err.message || 'Unable to complete analysis.');
-    }finally{state.busy=false;$('#start-analysis').disabled=false;}
+    }finally{state.busy=false;$('#start-analysis').disabled=false;document.body.classList.remove('is-analyzing');}
   }
   $('#start-analysis').addEventListener('click',startAnalysis);
+  $('#print-results').addEventListener('click',()=>{if(state.report)window.print();});
   $('#new-analysis').addEventListener('click',()=>{state.report=null;$('#results').hidden=true;$('#processing').hidden=true;$('#workspace').scrollIntoView({behavior:'smooth'});clearError();});
 
   function formatRule(v, currency=false) {return v==null?'Review required':currency?usd.format(v):Number(v).toFixed(2);}
@@ -187,6 +197,12 @@
     fill('#result-subtitle',`Processed ${state.files.previous.name} and ${state.files.updated.name} · ${state.parsed.previous.page_count} + ${state.parsed.updated.page_count} pages`);
     const reviewNote=c.review?` ${c.review} case(s) need human review because not all requirements can be verified.`:'';
     fill('#analysis-notice', `${isSample?'The 16 applicants are fictional examples, NOT your organization’s applicant population.':'The modeled cases come from your uploaded CSV.'} Results are deterministic simulations from explicit GPA and USD income rules, not a live Clocked call or an official eligibility determination.${reviewNote}`);
+    const loss=c.lost||0, gain=c.gained||0, review=c.review||0;
+    const impactTitle=review ? `${review} applicant${review===1?' needs':'s need'} a closer look` : loss || gain ? `${loss} lose eligibility. ${gain} gain it.` : 'No modeled eligibility changes';
+    fill('#insight-headline',impactTitle);
+    fill('#insight-description',review ? 'Some requirements are unsupported or ambiguous, so Ripple preserves uncertainty instead of guessing.' : `Comparing ${state.files.previous.name} with ${state.files.updated.name} across ${total} ${isSample?'fictional':'uploaded'} applicant${total===1?'':'s'}. Each decision can be inspected against the uploaded sources.`);
+    $('#insight-banner').classList.remove('show'); requestAnimationFrame(()=>$('#insight-banner').classList.add('show'));
+    $('#model-pill').textContent='LOCAL RULE MODEL · 0 CREDITS';
     fill('#rule-old-gpa',formatRule(r.policies.old.min_gpa));fill('#rule-new-gpa',formatRule(r.policies.new.min_gpa));
     fill('#rule-old-income',formatRule(r.policies.old.max_income,true));fill('#rule-new-income',formatRule(r.policies.new.max_income,true));
     fill('#rule-confidence',c.review?'At least one rule is unsupported or ambiguous. All impacted cases are marked for human review rather than assigned invented outcomes.':'Both policies contain an unambiguous GPA minimum and USD annual income ceiling. Calculated outcomes are limited to these two rules.');
