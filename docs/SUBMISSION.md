@@ -45,3 +45,10 @@ Open the sample. Follow any red path in the Consequence Map, inspect why it lost
 - [ ] Submission is **actually submitted and confirmed** by November 10, 2026, 11:59 PM US Eastern Time.
 
 **This document is a submission draft, not proof that the project has been submitted.**
+
+## Release receipt (source + Vercel)
+
+- Main release: [5f93b5f](https://github.com/debdutta1777/ripple-consequence-engine/commit/5f93b5fa167e7efd4171d997e23aad2a5deaad63)
+- Vercel: Production READY for that exact commit; stable public alias attached.
+- Recorded media: 61-second synthetic UI walkthrough supplied as a separate MP4 artifact, not uploaded publicly or submitted yet.
+- Reminder: a Vercel deployment is **not** a hackathon submission confirmation.

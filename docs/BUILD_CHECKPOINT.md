@@ -113,3 +113,11 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 2. Perform at most one protected four-call live Clocked smoke if a short-lived verifier can be configured and securely invoked; otherwise leave status UNVERIFIED.
 3. If possible, verify Clocked's genuine `return_pdf="highlight"` marked PDF output (one additional protected call). No fabricated source highlight will be called Clocked output.
 4. Record the challenge's external submission result separately; code deployment alone is **not** submission.
+
+### P07.2 — Verified Vercel release and judge media [COMPLETE, 2026-11-09]
+- GitHub release commit: `5f93b5fa167e7efd4171d997e23aad2a5deaad63`.
+- Vercel deployment `dpl_4R9pBSYatPqqagjnPAeTUrRtDSQY` was reported `READY`, target `production`, with matching commit SHA. The platform returned the stable `ripple-consequence-engine.vercel.app` alias for that deployment.
+- Local offline suite: 37 pytest tests, Node syntax check, Chromium UI smoke (map, presets, evidence, proof export, mobile/light/dark). No paid calls made.
+- Created a **61-second** silent screen walkthrough of the synthetic browser demo with an intro/outro slate and optional timed subtitles. This is not a live Clocked recording. Files delivered separately for upload to a video host or submission form.
+- Direct HTTP checks of public `/api/health` and `/api/demo` and a real Clocked call are still outstanding. Do not claim either from deployment metadata alone.
+- Code deployment is complete; **external hackathon submission is not yet confirmed**.

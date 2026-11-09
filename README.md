@@ -82,3 +82,13 @@ Read [security and credit controls](docs/SECURITY_REVIEW.md) before invoking the
 **Challenge submission:** *not yet submitted by the assistant.* See the [submission checklist](docs/SUBMISSION.md).
 
 **Responsible-use note:** This is a prototype demonstrating the consequences of *fictional* policy changes. It must not be used for actual scholarship awards, legal decisions, benefits determinations, or financial decisions without substantially more validation, governance, review, and controls.
+
+## Optional one-minute screen capture
+
+`python -m scripts.record_demo` records a **synthetic offline** browser walkthrough on a Linux desktop with `xvfb-run`, Chromium and `ffmpeg`. Use:
+
+```bash
+xvfb-run -a -s "-screen 0 1440x900x24" env CHROMIUM_PATH=/usr/bin/chromium python -m scripts.record_demo
+```
+
+The separately delivered `Ripple_Judge_Walkthrough.mp4` is a 61-second visual demonstration with no voiceover; `docs/JUDGE_DEMO.md` provides a spoken narration. This is not evidence of authenticated Clocked responses.

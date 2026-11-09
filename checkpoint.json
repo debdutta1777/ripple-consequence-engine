@@ -1,9 +1,9 @@
 {
   "project": "Ripple \u2014 The Consequence Engine",
-  "checkpoint_version": 5,
+  "checkpoint_version": 6,
   "last_updated": "2026-11-09",
-  "last_completed": "P05",
-  "current_phase": "P03.2",
+  "last_completed": "P07.2",
+  "current_phase": "P03.2_live_verification_and_submission",
   "completed_phases": [
     "P00",
     "P01",
@@ -25,7 +25,7 @@
     "P04": "partial_live_pdf_annotation_unverified",
     "P05": "complete_offline",
     "P06": "complete_offline_live_qa_pending",
-    "P07": "in_progress_public_site_user_confirmed_latest_build_pending"
+    "P07": "production_deployed_submission_not_confirmed"
   },
   "verified": {
     "python_tests": "37 passed locally on 2026-11-09 (all offline/mock)",
@@ -33,25 +33,28 @@
     "chromium_smoke": "Passed offline for light/dark theme, case cards, consequence paths, Rule Lab slider and presets, SVG keyboard navigation, guided tour, PDF preview, evidence source lens, HTML proof download and 390-1440px breakpoints",
     "live_clocked_calls": false,
     "clocked_secret_metadata": "Sensitive Production CLOCKED_API_KEY existence confirmed without decrypting (no secret read)",
-    "public_deployment": "User confirmed earlier light-first Vercel deployment, not yet this release",
+    "public_deployment": "Verified by connected Vercel: commit 5f93b5fa167e7efd4171d997e23aad2a5deaad63 is READY Production, stable ripple-consequence-engine.vercel.app alias points to this deployment.",
     "demo_no_paid_requests": true,
     "protected_verifier": "Implemented and fake-SDK tested; requires explicit admin token, expiry, flag and separate temporary redeployment",
     "pdf_native_marking": "Implemented with SDK marked_pdf call, mock-only; actual annotation is unknown",
     "source_lens": "Verbatim source fragment highlight, page-aware original PDF navigation in browser; not the SDK native marked PDF",
     "repository": "debdutta1777/ripple-consequence-engine",
-    "production_url": "https://ripple-consequence-engine.vercel.app/"
+    "production_url": "https://ripple-consequence-engine.vercel.app/",
+    "release_commit": "5f93b5fa167e7efd4171d997e23aad2a5deaad63",
+    "production_deployment_id": "dpl_4R9pBSYatPqqagjnPAeTUrRtDSQY",
+    "demo_video": "61-second synthetic UI walkthrough recorded offline at 1280x720, in /mnt/data/Ripple_Judge_Walkthrough.mp4, silent; not a live Clocked demo.",
+    "live_http_route_checks": "Vercel deployment and alias verified; direct HTTP endpoint smoke on public domain not independently executed."
   },
   "blockers": [
-    "Authentic Clocked Extract, Compare, Rerank and marked-PDF output not yet run; no SDK response and no actual paid credit totals are verified.",
-    "Latest GitHub push/Vercel Production deployment has not yet been verified. A prior light UI version was user-confirmed.",
-    "Hackathon submission on the organizer website remains a separate, unconfirmed user action."
+    "Real Clocked Extract, Compare, Rerank and marked PDF outputs have not been authenticated. Mock testing passed; live field shapes and actual credits remain unverified.",
+    "A direct production HTTP smoke request for /api/health and /api/demo has not been independently completed; Vercel reports Production READY with stable alias.",
+    "External Clocked hackathon submission remains unconfirmed: user must upload video / complete organizer form and verify submission receipt."
   ],
   "next_actions": [
-    "Push the release with P05, protected admin verification and documentation to GitHub.",
-    "Verify the exact release commit is Ready on Vercel and test safe public /api/health and /api/demo.",
-    "Make at most one narrowly scoped authenticated Clocked smoke call only if expiring verifier secret can be safely configured; do not expose public paid routes.",
-    "Record actual evidence in docs/VERIFICATION_RESULTS.md only after success, otherwise keep unverified flag.",
-    "Prepare a concise demo recording and have user complete the external hackathon submission confirmation."
+    "Use a short-lived secret verifier in Vercel to conduct at most one small real Clocked test against fictional docs, or leave the API integration labeled unverified; never enable public unrestricted paid analysis.",
+    "Open https://ripple-consequence-engine.vercel.app/ in a fresh browser and verify the Rule Lab, consequence paths and PDF sample, plus /api/health.",
+    "Upload the completed 61-second synthetic demo video (add voiceover if desired), attach GitHub and Vercel URLs, and submit through the Clocked organizer before the deadline. Confirm receipt.",
+    "After actual submission or a verified Clocked run, update checkpoint and docs/VERIFICATION_RESULTS.md rather than making assumptions."
   ],
   "notes": "All offline tests use mocked or synthetic data. No Clocked key is stored in this file. A live API path written in source code is not proof of authenticated success."
 }

@@ -23,7 +23,7 @@ One checkpoint per completed phase; code and status must be committed together. 
 | P06.2 | Secure public mode | Complete prototype | No public paid calls, expiring admin verifier, safe response headers |
 | P06.3 | Real network and live QA | Pending real deployment confirmation | Actual deployed site, PDF flow, authenticated Clocked output |
 | P07.1 | Public repository | Complete | GitHub history with roadmap/checkpoints |
-| P07.2 | Production deployment | User-confirmed previous build | Latest commit's Ready production state needs verification |
+| P07.2 | Production deployment | Complete for core release | GitHub commit `5f93b5f` confirmed Vercel Production READY and stable alias assigned |
 | P07.3 | Submission docs and demo | Complete docs; video pending | `docs/SUBMISSION.md` and `docs/JUDGE_DEMO.md` |
 | P07.4 | Submit to organizer | User action pending | Submission receipt/link; do not claim submission before confirmed |
 
