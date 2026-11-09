@@ -6,17 +6,19 @@
 
 1. Open a terminal in the `ripple-consequence-engine` project directory.
 2. Copy the provided template: `Copy-Item .env.example .env`.
-3. Open it locally with `notepad .env`. Set `CLOCKED_API_KEY=<your secret>` and `ENABLE_LIVE=true`. Save the file **on your computer only**.
+3. Open it locally with `notepad .env`. Set `CLOCKED_API_KEY=<your secret>`. Keep `ENABLE_LIVE=false` and `MAX_LIVE_ANALYSES=0` until a controlled live test is approved. Save the file **on your computer only**.
 4. Install dependencies: `py -m pip install -r requirements.txt`.
 5. Start the backend: `py -m uvicorn app.main:app --reload`.
-6. Visit `http://127.0.0.1:8000/api/health`. It should show `"live_enabled": true` without exposing the secret.
+6. Visit `http://127.0.0.1:8000/api/health`. It should show `"live_enabled": false` until you explicitly opt into a test with `ENABLE_LIVE=true` and a positive `MAX_LIVE_ANALYSES` value.
 7. Open `http://127.0.0.1:8000` and use **Analyze live** only when ready to spend credits.
 
 The local `.env` is ignored by Git, and `app/main.py` loads it at startup. This is practical local secret storage, though anyone with access to your local files/account could read it. For more restrictive security, use your OS's secret manager or transient process environment instead.
 
 ## Hosting
 
-In Render, go to the web service's **Environment** settings; set `CLOCKED_API_KEY` as a secret and `ENABLE_LIVE=true`. Never commit or upload the `.env` file. Hosting environment values take priority over `.env`. Use `MAX_LIVE_ANALYSES` to limit the number of real runs the public demo process will accept (this is **not** a global durable rate limit).
+On Vercel, set `CLOCKED_API_KEY` as a **Sensitive** Production environment variable. Keep `ENABLE_LIVE=false` while testing the free demo. Only briefly turn on `ENABLE_LIVE=true` with `MAX_LIVE_ANALYSES=1` for a planned test; disable it immediately afterward and redeploy so the change takes effect. Never commit `.env`. Hosting values take priority over local `.env`.
+
+**Important:** `MAX_LIVE_ANALYSES` is an in-process convenience guard, not a global or durable spending cap; Vercel can create fresh serverless instances. Never leave a public, unauthenticated live endpoint enabled relying on this counter alone. Use an authenticated endpoint and durable quota enforcement for any ongoing public live traffic.
 
 ## Safety checklist
 

@@ -168,8 +168,9 @@ function render(){
   $('case-matrix').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ui.selected=btn.dataset.caseId;ui.gpa=null;ui.income=null;render();document.getElementById('inspector').scrollIntoView({behavior:'smooth',block:'start'});}));
   renderCase();
   const calls=d.api_calls?.length?d.api_calls.join(' · '):'No Clocked calls: this is a synthetic demonstration.';
-  $('backend-disclosure').textContent=d.mode==='live'?`Clocked API calls: ${calls}. Policy rules drive deterministic case decisions; missing evidence requires human review.`:`${calls} This fictional sample uses deterministic GPA/income checks. Live API analysis is a separate action and requires server-side configuration.`;
-  $('trace-output').textContent=JSON.stringify({mode:d.mode,notice:d.notice,api_calls:d.api_calls,comparison:d.comparison,extraction:d.extraction,relevance:d.relevance},null,2);
+  const billed=d.mode==='live'&&d.usage?.credits!=null?` · ${d.usage.credits} SDK-reported credits this run`:'';
+  $('backend-disclosure').textContent=d.mode==='live'?`Clocked API calls: ${calls}${billed}. Policy rules drive deterministic case decisions; missing evidence requires human review.`:`${calls} This fictional sample uses deterministic GPA/income checks. Live API analysis is a separate action and requires server-side configuration.`;
+  $('trace-output').textContent=JSON.stringify({mode:d.mode,notice:d.notice,api_calls:d.api_calls,usage:d.usage,comparison:d.comparison,extraction:d.extraction,relevance:d.relevance},null,2);
 }
 function renderCase(){
   const c=currentCase();if(!c)return;
@@ -262,11 +263,11 @@ async function boot(){
   try{
     const r=await fetch('/api/health');if(!r.ok)throw new Error('Health unavailable');
     const h=await r.json();ui.liveReady=!!h.live_enabled;
-    $('api-status').textContent=h.live_enabled?'Clocked connected':'Demo ready';
+    $('api-status').textContent=h.live_enabled?'Clocked live enabled':'Demo ready';
     if(!h.live_enabled){
       $('analyze-live').disabled=true;
       $('analyze-live').title='Enable CLOCKED_API_KEY and ENABLE_LIVE in the Vercel project to analyze custom text';
-      $('live-explainer').textContent='Live Clocked analysis needs a backend API key. The one-click synthetic demo, evidence viewer, filters and simulations are fully interactive.';
+      $('live-explainer').textContent='Clocked live analysis is currently locked to protect credits. The synthetic demo, evidence viewer, filters and simulations remain free to use.';
     }
   }catch{
     $('api-status').textContent='Backend unavailable';

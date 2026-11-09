@@ -1,30 +1,34 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 3,
+  "checkpoint_version": 4,
   "last_updated": "2026-11-09",
-  "last_completed": "P04.1",
+  "last_completed": "P03.1b",
   "current_phase": "P03",
   "completed_phases": [
     "P00",
     "P01",
     "P02",
     "UI-01",
-    "P04.1"
+    "P04.1",
+    "P03.1",
+    "P03.1b"
   ],
   "phases": {
     "P00": "complete",
     "P01": "complete",
     "P02": "complete",
-    "P03": "blocked_on_key",
+    "P03": "in_progress",
     "P04": "in_progress",
     "P05": "queued",
     "P06": "queued",
     "P07": "queued",
     "UI-01": "complete",
-    "P04.1": "complete"
+    "P04.1": "complete",
+    "P03.1": "complete",
+    "P03.1b": "complete"
   },
   "verified": {
-    "python_tests": "27 passed on 2026-11-09 (includes 7 PDF-ingest tests)",
+    "python_tests": "30 passed on 2026-11-09 (offline, includes 3 new cost guard/usage tests)",
     "javascript": "node --check web/app.js passed",
     "baseline_synthetic": true,
     "live_clocked_calls": false,
@@ -36,18 +40,22 @@
     "ui_filtering": "All / lost / gained / stable / review in Chromium",
     "local_http_routes": "200 for /, /assets/styles.css, /assets/app.js, /api/health, /api/demo; browser local HTTP blocked by sandbox policy",
     "vercel_git_connection": "Project appears in Vercel project search; linked GitHub import reported by user",
-    "pdf_text_preview": "Validated up to 2 MB and 12 pages, local request-only parsing with pypdf; sample text PDFs served via /assets/samples/. No OCR, no Clocked request."
+    "pdf_text_preview": "Validated up to 2 MB and 12 pages, local request-only parsing with pypdf; sample text PDFs served via /assets/samples/. No OCR, no Clocked request.",
+    "clocked_secret_metadata": "Confirmed Vercel project has CLOCKED_API_KEY with type Sensitive and Production target via decrypt=false. Value was not accessed.",
+    "usage_telemetry": "SDK metadata aggregation for extract x2 + compare + rerank implemented and offline-tested; no real billing values observed.",
+    "live_gate": "ENABLE_LIVE=true plus explicit MAX_LIVE_ANALYSES>0 required; missing config fails closed; 0 real Clocked calls. Process budget is not durable on serverless."
   },
   "blockers": [
-    "P03: User still needs to configure CLOCKED_API_KEY privately in Vercel with ENABLE_LIVE=true; no paid Clocked request has been performed.",
-    "P04.2–P04.4: True Clocked PDF-mode spans and annotated PDF outputs require live API contract verification; current evidence navigation uses extracted text, not PDF highlighting.",
-    "Vercel deployment API access is limited; verify new GitHub commit redeploy through public URL or the Vercel dashboard."
+    "P03.2-P03.4: User Clocked secret metadata present, but authenticated endpoint responses are not yet verified. ENABLE_LIVE remains off; MAX_LIVE_ANALYSES default 0.",
+    "Live endpoint is public if enabled; in-process budget is not global/durable on Vercel. Require supervised testing and durable quota/access control before enabling public paid use.",
+    "P04.2-P04.4: True Clocked PDF mode and annotated PDF require response contract verification.",
+    "Production deploy status after this commit requires independent verification."
   ],
   "next_actions": [
-    "Confirm that P04.1 GitHub commit reached the Vercel live site; test one sample PDF upload without using Clocked.",
-    "Configure CLOCKED_API_KEY as a Sensitive variable in Vercel. Keep ENABLE_LIVE=false until ready for controlled (four-call) live test.",
-    "Verify real Clocked extract/compare/rerank responses with fictional policy inputs and record P03 contract checks; do not mark them verified before testing.",
-    "Then implement PDF evidence page/annotation against actual Clocked SDK results."
+    "Push cost-safety and telemetry changes to GitHub; confirm Vercel picked up new commit and health remains demo-only.",
+    "Plan a supervised 4-call synthetic Clocked smoke test without making the public /api/analyze endpoint generally available.",
+    "Adjust SDK field/compare/rerank mappings after observing sanitized real response metadata; record true credit usage.",
+    "Proceed with Clocked PDF evidence and annotated PDF integration."
   ],
   "notes": "All 27 tests and Chromium smoke are local, offline, and do not establish real Clocked API success. PDF preview is separate from live semantic analysis and no PDF data is persisted by the app."
 }

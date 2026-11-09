@@ -33,13 +33,25 @@ class AnalyzeRequest(BaseModel):
 _lock = threading.Lock()
 _usage = {"total": 0}
 
+
+def live_budget() -> int:
+    """A fail-closed, per-process soft cap. This is NOT a global serverless quota."""
+    try:
+        return max(0, min(25, int(os.getenv("MAX_LIVE_ANALYSES", "0"))))
+    except (ValueError, TypeError):
+        return 0
+
+
+def live_ready() -> bool:
+    return bool(os.getenv("CLOCKED_API_KEY")) and os.getenv("ENABLE_LIVE") == "true" and live_budget() > 0
+
 @app.get("/")
 def index():
     return FileResponse(ROOT / "web" / "index.html")
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "live_enabled": bool(os.getenv("CLOCKED_API_KEY")) and os.getenv("ENABLE_LIVE") == "true"}
+    return {"status": "ok", "live_enabled": live_ready()}
 
 @app.get("/api/demo")
 def demo():
@@ -63,10 +75,10 @@ async def parse_pdf(file: UploadFile = File(...)):
 
 @app.post("/api/analyze")
 async def analyze(request: Request, payload: AnalyzeRequest):
-    if not os.getenv("CLOCKED_API_KEY") or os.getenv("ENABLE_LIVE") != "true":
-        raise HTTPException(503, "Live integration disabled. Set CLOCKED_API_KEY and ENABLE_LIVE=true on the backend. The synthetic demo works without a key.")
+    if not live_ready():
+        raise HTTPException(503, "Live analysis is locked. The administrator must configure an API key, explicitly enable live mode, and set a positive analysis budget. The synthetic demo remains available.")
     with _lock:
-        max_calls = max(0, int(os.getenv("MAX_LIVE_ANALYSES", "30")))
+        max_calls = live_budget()
         if _usage["total"] >= max_calls:
             raise HTTPException(429, "This public demo has reached its live-analysis budget. Try the fully working synthetic preview.")
         _usage["total"] += 1

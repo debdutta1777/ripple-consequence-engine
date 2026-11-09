@@ -30,13 +30,13 @@ This plan turns the Clocked Build Challenge project into **small, individually v
 - [x] Test through isolated Chromium at mobile/tablet/desktop widths; verify flip, filters and evidence.
 - [x] User confirmed UI-01 light-mode redesign appeared on their Vercel URL. (2026-11-09)
 
-## P03 — Verify live Clocked API integration [ACTIVE — NEEDS USER CONFIGURATION]
-- [ ] P03.1 User sets `CLOCKED_API_KEY` locally/inside deployment host, without posting it in chat.
+## P03 — Verify live Clocked API integration [ACTIVE — KEY METADATA VERIFIED; CONTROLLED TEST PENDING]
+- [x] P03.1 User saved `CLOCKED_API_KEY` as a Sensitive Production variable in Vercel; confirmed key metadata through the authenticated Vercel connection without decrypting or reading its value (2026-11-09).
 - [ ] P03.2 Run a small authenticated Extract request; inspect the real response field and span shapes.
 - [ ] P03.3 Compare the fictional old/new policies with the real Compare endpoint.
 - [ ] P03.4 Verify Rerank IDs, scores, and response shape; display the trace honestly.
 - [ ] P03.5 Harden parser for actual live responses, semantic direction, ambiguous clauses, and failure handling. (Directional checks and unit tests done; live shape/error checks outstanding.)
-- [ ] P03.6 Record real endpoint evidence, latency/cost metadata if provided, and verified integration tests (redacted of any keys).
+- [ ] P03.6 Record real endpoint evidence, latency/cost metadata if provided, and verified integration tests (redacted of any keys). SDK usage aggregation and 30 offline tests are implemented; real values remain unknown.
 
 ## P04 — Genuine source evidence and PDF workflow [IN PROGRESS — P04.1 VERIFIED]
 - [x] P04.1 Accept constrained text-based PDF inputs (2 MB/12 pages/12k chars), preview extracted source text and page offsets, and reject scans/passwords/corrupt/oversized files. UI: individual old/new uploaders and download-ready fictional sample PDFs. Zero Clocked calls for preview. (2026-11-09)
@@ -66,3 +66,10 @@ This plan turns the Clocked Build Challenge project into **small, individually v
 
 ## Scope / non-goals
 This is a *decision simulation* for **fictional scholarship applicants**, not a production aid-decision system. There is no guarantee of any award. Only two modeled requirements are eligible for automatic evaluation; any other case is flagged for review. User credentials and real personal applicant data are not necessary for the hackathon demo.
+
+### P03.1b — Cost safety and billing telemetry [COMPLETE; 2026-11-09]
+- [x] Default live budget to zero; require explicit `ENABLE_LIVE=true` **and** positive `MAX_LIVE_ANALYSES`.
+- [x] Capture optional SDK `credits`, `cost_usd` and `model_ms` for the four real Clocked calls without extra API requests.
+- [x] Display a real credit total only when all SDK metadata is present; never invent credit/cost values.
+- [x] Test fail-closed budget, metered fake SDK, and missing usage metadata. 30 offline tests + Chromium mock smoke passed.
+- [ ] Public live mode needs durable global quotas and authentication before enabling judge access; the in-process counter is only a soft cap.

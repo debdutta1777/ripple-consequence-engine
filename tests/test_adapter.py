@@ -74,3 +74,38 @@ def test_unsupported_extra_conditions_force_review():
     old = OLD_TEXT + 'Applicant must also be a resident of the state.\n'
     result = analyze_live(client, old, NEW_TEXT, [{"id": "A01", "name": "Applicant 01", "gpa": 3.8, "income": 30000}])
     assert result["impact"]["cases"][0]["transition"] == "review"
+
+
+def test_clocked_sdk_usage_totals_are_reported_if_available():
+    from app.demo import OLD_TEXT, NEW_TEXT, APPLICANTS
+
+    class Recorded(dict):
+        def __init__(self, raw, credits, cost_usd):
+            super().__init__(raw)
+            self.credits = credits
+            self.cost_usd = cost_usd
+            self.model_ms = credits * 25
+
+    class MeteredClocked(FakeClocked):
+        def extract(self, text, **kwargs):
+            return Recorded(super().extract(text, **kwargs), 2, 0.0001)
+        def compare(self, **kwargs):
+            return Recorded(super().compare(**kwargs), 5, 0.0003)
+        def rerank(self, **kwargs):
+            return Recorded(super().rerank(**kwargs), 3, 0.0002)
+
+    result = analyze_live(MeteredClocked(), OLD_TEXT, NEW_TEXT, APPLICANTS)
+    usage = result['usage']
+    assert usage['request_count'] == 4
+    assert usage['credits'] == 12
+    assert usage['cost_usd'] == 0.0007
+    assert len(usage['records']) == 4
+    assert usage['records'][0]['endpoint'] == 'extract_previous'
+
+
+def test_usage_unknown_when_sdk_exposes_no_billing_metadata():
+    from app.demo import OLD_TEXT, NEW_TEXT, APPLICANTS
+    result = analyze_live(FakeClocked(), OLD_TEXT, NEW_TEXT, APPLICANTS)
+    assert result['usage']['credits'] is None
+    assert result['usage']['cost_usd'] is None
+    assert result['usage']['request_count'] == 4

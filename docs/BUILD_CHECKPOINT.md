@@ -1,8 +1,8 @@
 # Ripple build checkpoint — update after every completed phase
 
 **Last verified:** 2026-11-09  
-**Last completed phase:** `P04.1` (out-of-sequence PDF preview; P03 still needs secure API configuration)  
-**Current phase:** `P03` — live Clocked contract validation (blocked on secure key configuration)  
+**Last completed microphase:** `P03.1b` (production secret metadata verification + usage-safe default + telemetry; P03 live endpoint verification pending)  
+**Current phase:** `P03` — live Clocked contract validation (key exists securely; gated by disabled mode and zero default budget)  
 **Suggested resume command:** `python -m pytest -q && node --check web/app.js && CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`  
 **Core status file:** `checkpoint.json`  
 **Full microphase plan:** `docs/PHASE_PLAN.md`
@@ -49,7 +49,7 @@
 
 ## Current blockers
 
-**P03 requires a real Clocked key** in the local/server environment. The key is intentionally not accepted in chat. Follow `docs/SECURE_API_SETUP.md`. Once set, run an authenticated Extract request and examine the returned field structures before asserting the live UI works. Never include secret values in recordings or trace exports.
+**P03.1 has been verified:** Vercel's project environment-variable listing (with `decrypt=false`) shows a `CLOCKED_API_KEY` entry of type `sensitive`, target `production`. No value was retrieved or stored. `ENABLE_LIVE` and `MAX_LIVE_ANALYSES` were not found in the project metadata, so live analysis stays off by design. P03.2–P03.4 remain unverified: the key's validity and actual endpoint responses have not been tested. Never expose the secret in logs, traces or screenshots.
 
 ## Partial work completed in later phases (NOT marked complete)
 
@@ -67,11 +67,20 @@
 ## Next exact steps
 
 1. Confirm the PDF upload commit redeploys from GitHub to the user-provided Vercel URL; text preview should cost no Clocked credits.
-2. Complete `P03.1` secret setup. Confirm only `/api/health` reports `live_enabled: true` (no key shown).
-3. Test `P03.2–P03.4` using the two synthetic policy texts, inspect real Clocked responses, and adjust response parser if needed.
-4. Add negative semantic checks for misleading GPA/income directions and ambiguous clauses (`P03.5`), then tests.
-5. Capture desktop and mobile visual evidence for the new flip path (`P06.3`) when practical.
+2. Check that the protected production deployment accepts the new fail-closed `MAX_LIVE_ANALYSES=0` default. This is an offline/config check and costs no credits.
+3. Before running actual Clocked calls, implement durable usage protection or temporarily enable the backend for a supervised test; do not leave the anonymous endpoint open based only on the in-memory budget.
+4. Test `P03.2–P03.4` using fictional policy text with the real SDK, inspect and sanitize responses, and record actual credit totals. Four requests are planned for the complete flow.
+5. Continue P04.2 PDF evidence spans when the real API response shapes are known.
 
 ## Checkpoint maintenance protocol
 
 After **every** phase: update both this human-readable file and `checkpoint.json`, record tests with exact results and links/paths to artifacts, note unresolved work, and identify the *next one or two concrete actions*. Avoid marking a phase complete if a required live verification is blocked.
+
+
+### P03.1b — Secure key confirmation and usage instrumentation [complete; 2026-11-09]
+- Queried Vercel's `filter_project_envs(decrypt=false)` by project **name**; `CLOCKED_API_KEY` is a Sensitive Production variable. The integration returned only metadata and no secret value was accessed.
+- Neither `ENABLE_LIVE` nor `MAX_LIVE_ANALYSES` was present; no authenticated live-analysis request was initiated.
+- Changed the backend to fail closed unless a positive per-process budget is explicitly configured. Default `MAX_LIVE_ANALYSES=0` and `ENABLE_LIVE=false` in `.env.example`. Even a positive in-process budget **is not a durable spending limit on Vercel**.
+- Added SDK credit/cost/latency metadata to a live response, provided the SDK reports it; also show credits in the UI only when present. This instrumentation does not create extra Clocked calls.
+- `python -m pytest -q`: **30 passed**; `node --check web/app.js`: **passed**; `CHROMIUM_PATH=/usr/bin/chromium python -m scripts.browser_smoke`: **passed** with mock API. No real Clocked credits consumed.
+- Real SDK contract/latency/billing values are still unknown, so P03.2 onward remains incomplete.

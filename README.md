@@ -40,6 +40,7 @@ Open http://127.0.0.1:8000. The synthetic demo works without a key.
 # Linux / macOS
 export CLOCKED_API_KEY='your-real-secret'
 export ENABLE_LIVE=true
+export MAX_LIVE_ANALYSES=1  # controlled test only
 uvicorn app.main:app --reload
 ```
 
@@ -48,6 +49,7 @@ Windows PowerShell:
 ```powershell
 $env:CLOCKED_API_KEY='your-real-secret'
 $env:ENABLE_LIVE='true'
+$env:MAX_LIVE_ANALYSES='1'  # controlled test only
 uvicorn app.main:app --reload
 ```
 
@@ -74,7 +76,7 @@ curl -X POST http://localhost:8000/api/analyze \
   }'
 ```
 
-API calls are made only on explicit live analysis, not on every slider change. The backend validates input lengths, applicant ranges, and a process-level live request budget (`MAX_LIVE_ANALYSES`, default 30). For a production public service add persistent per-IP rate limiting and access control. The cost guard is deliberately simple and resets on process restart; deployment concurrency may multiply the budget.
+API calls are made only on explicit live analysis, not on every slider change. The backend validates input lengths, applicant ranges, and a process-level live request budget (`MAX_LIVE_ANALYSES`, default **0 (locked)**). For a production public service add persistent per-IP rate limiting and access control. The cost guard is deliberately simple and resets on process restart; deployment concurrency may multiply the budget.
 
 ## Evidence integrity and limitations
 
@@ -82,7 +84,7 @@ Clocked's **Compare** endpoint detects cross-document conflicts and duplicates; 
 
 Clocked returns evidence positions and marked PDFs on supported endpoints; this starter uses text excerpts and the raw trace because it accepts plain text. PDF uploads and annotated-PDF previews are the next milestone.
 
-> **Live API calls have not been verified against an account in this starter** because no key has been configured. The module is written to the public SDK examples, and unit tests use mocked responses. Before submission, run with a real key, inspect the raw field shapes, and adjust extraction parsing if the live response differs.
+> **Live API calls have not been verified against the user's Clocked account.** The API key was confirmed present as a Sensitive Vercel Production variable on November 9, 2026, but live mode is still locked and no authenticated response has been inspected. The module is written to the public SDK examples, and unit tests use mocked responses. Before submission, run with a real key, inspect the raw field shapes, and adjust extraction parsing if the live response differs.
 
 ## Browser visual smoke test
 
@@ -106,7 +108,7 @@ Tests cover loss and gain, inclusive boundaries, review on missing evidence, rej
 
 ## Deployment
 
-The site is structured for a single FastAPI deployment on Vercel (`main.py` exports the app) and retains `render.yaml` as an alternative. GitHub changes can automatically trigger Vercel deployments when the integration is correctly connected. Keep the key in hosting environment settings, never in source control. To allow judges to use live analysis, set `ENABLE_LIVE=true` and `CLOCKED_API_KEY` in deployment settings. Adjust the live request budget conservatively to protect the hackathon credits. If live isn't configured, the sample remains fully usable without login.
+The site is structured for a single FastAPI deployment on Vercel (`main.py` exports the app) and retains `render.yaml` as an alternative. GitHub changes can automatically trigger Vercel deployments when the integration is correctly connected. Keep the key in hosting environment settings, never in source control. For a planned one-off test, explicitly set `ENABLE_LIVE=true` and a positive `MAX_LIVE_ANALYSES` in deployment settings, then redeploy. **Do not leave an unauthenticated public live endpoint enabled**: the in-memory counter is not a reliable spending cap across serverless instances. Add proper authentication and durable rate enforcement before allowing public judge-triggered live analysis. If live isn't configured, the sample remains fully usable without login.
 
 ## Hackathon entry checklist
 
@@ -147,3 +149,10 @@ On the Impact Studio page you can now choose **Upload previous PDF** or **Upload
 Downloadable, wholly fictional PDF examples are provided in `web/samples/`. The extracted text is shown in the normal policy editors for human review. **Uploading a PDF does not recompute the eligibility outcomes**. If text changes, Ripple shows a stale-analysis warning and blocks evidence jumps until a new analysis is performed. That separate live action currently makes **up to four Clocked API requests** (Extract twice, Compare, Rerank) only when the server secret and `ENABLE_LIVE=true` are configured.
 
 This milestone does not yet include Clocked PDF-mode extraction, PDF annotations/highlights, or any real Clocked endpoint validation. `MAX_LIVE_ANALYSES` is a per-process safety limit, **not** a global hard budget across Vercel serverless instances; keep live analysis disabled until you are ready to monitor API usage. Never upload real student personal data to the hackathon demo.
+
+
+## P03.1 — Vercel secret metadata confirmed, usage guard strengthened
+
+The `CLOCKED_API_KEY` variable exists as a **Sensitive** value in Vercel Production. The secret itself has never been viewed or copied. For safety, the default `MAX_LIVE_ANALYSES` is now **0** and the dashboard will not enable live analysis until `ENABLE_LIVE=true` and an explicit positive budget are both configured. This is a local/process soft budget only and does not securely limit total expenditure across Vercel serverless instances.
+
+When Clocked analysis is deliberately run, the server records SDK-reported `credits`, `cost_usd`, and `model_ms` per endpoint. The UI and evidence trace display credits only if metadata is actually returned; otherwise it reports an unknown cost instead of making one up. No additional Clocked requests are needed for this telemetry.

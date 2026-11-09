@@ -5,10 +5,32 @@ from live API calls is replaced with fixture results. Review is preferred over
 inventing a decision. The raw compare response is made inspectable.
 """
 import re
+import math
 from typing import Any
 from app.rules import Policy, impact
 
 MAX_POLICY_LENGTH = 12_000
+
+
+def _usage_record(endpoint: str, result: Any) -> dict:
+    """Read optional, official SDK response metadata; never infer billed credits."""
+    record = {"endpoint": endpoint}
+    for field in ("credits", "cost_usd", "model_ms"):
+        value = getattr(result, field, None)
+        record[field] = value if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value >= 0 else None
+    return record
+
+
+def _usage_summary(records: list[dict]) -> dict:
+    credit_values = [r["credits"] for r in records]
+    cost_values = [r["cost_usd"] for r in records]
+    return {
+        "request_count": len(records),
+        "credits": sum(credit_values) if all(x is not None for x in credit_values) else None,
+        "cost_usd": round(sum(cost_values), 8) if all(x is not None for x in cost_values) else None,
+        "records": records,
+        "note": "SDK-reported usage for this analysis; not a global spending cap.",
+    }
 
 
 def _root_json(result: Any) -> dict:
@@ -117,8 +139,8 @@ def _extract_supported_rule(fields: dict, name: str, original: str, *, gpa: bool
     return n, raw
 
 
-def _derive_policy(client, text: str, label: str) -> tuple[Policy, dict]:
-    extracted = _root_json(client.extract(
+def _derive_policy(client, text: str, label: str) -> tuple[Policy, dict, dict]:
+    extract_result = client.extract(
         text=text,
         instructions=(
             "Read ONLY the eligibility requirements of this policy. Copy a single "
@@ -130,7 +152,9 @@ def _derive_policy(client, text: str, label: str) -> tuple[Policy, dict]:
             "minimum_gpa": "Exact excerpt explicitly stating the minimum required cumulative GPA (0.0–4.0 scale)",
             "maximum_household_income": "Exact excerpt explicitly stating the maximum allowed annual household income, including the monetary amount",
         },
-    ))
+    )
+    extracted = _root_json(extract_result)
+    usage = _usage_record("extract_previous" if label == "Previous version" else "extract_current", extract_result)
     # This demo is intentionally conservative about conditions outside its schema.
     # If it detects an additional restriction/exception, do not issue a positive
     # decision based on GPA and income alone. This is a heuristic, not a proof
@@ -147,7 +171,7 @@ def _derive_policy(client, text: str, label: str) -> tuple[Policy, dict]:
     if unsupported:
         gpa = None
         income = None
-    return Policy(label, gpa, income, gpa_excerpt, income_excerpt, "clocked.extract"), extracted
+    return Policy(label, gpa, income, gpa_excerpt, income_excerpt, "clocked.extract"), extracted, usage
 
 
 def analyze_live(client, old: str, new: str, applicants: list[dict]) -> dict:
@@ -155,12 +179,13 @@ def analyze_live(client, old: str, new: str, applicants: list[dict]) -> dict:
         raise ValueError("Both policy versions need text")
     if len(old) > MAX_POLICY_LENGTH or len(new) > MAX_POLICY_LENGTH:
         raise ValueError("Each policy must be at most 12,000 characters")
-    old_policy, old_extract = _derive_policy(client, old, "Previous version")
-    new_policy, new_extract = _derive_policy(client, new, "Current version")
-    compared = _root_json(client.compare(documents=[
+    old_policy, old_extract, old_usage = _derive_policy(client, old, "Previous version")
+    new_policy, new_extract, new_usage = _derive_policy(client, new, "Current version")
+    compare_result = client.compare(documents=[
         {"id": "previous", "text": old, "title": "Previous policy"},
         {"id": "current", "text": new, "title": "Current policy"},
-    ]))
+    ])
+    compared = _root_json(compare_result)
     # Rerank clauses so the reviewer can inspect which policies are relevant to the question.
     candidate_docs = [
         {"id": "prev-gpa", "text": old_policy.gpa_evidence or "No verified minimum GPA evidence"},
@@ -168,11 +193,13 @@ def analyze_live(client, old: str, new: str, applicants: list[dict]) -> dict:
         {"id": "current-gpa", "text": new_policy.gpa_evidence or "No verified minimum GPA evidence"},
         {"id": "current-income", "text": new_policy.income_evidence or "No verified maximum income evidence"},
     ]
-    ranked = _root_json(client.rerank(
+    rerank_result = client.rerank(
         query="Which exact clauses establish the minimum GPA and maximum household income eligibility requirements, and where do those thresholds change?",
         documents=candidate_docs,
         top_n=4,
-    ))
+    )
+    ranked = _root_json(rerank_result)
+    usage = _usage_summary([old_usage, new_usage, _usage_record("compare", compare_result), _usage_record("rerank", rerank_result)])
     return {
         "mode": "live",
         "notice": "Live Clocked extraction, comparison and relevance ranking. Results remain conditional on the completeness of the policy and review of extracted evidence.",
@@ -183,4 +210,5 @@ def analyze_live(client, old: str, new: str, applicants: list[dict]) -> dict:
         "extraction": {"old": old_extract, "new": new_extract},
         "impact": impact(old_policy, new_policy, applicants),
         "api_calls": ["Clocked Extract ×2", "Clocked Compare ×1", "Clocked Rerank ×1"],
+        "usage": usage,
     }
