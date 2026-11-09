@@ -1,9 +1,9 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 13,
+  "checkpoint_version": 14,
   "last_updated": "2026-11-10",
-  "last_completed": "P03.2_authenticated_clocked_validation",
-  "current_phase": "P04_live_pdf_highlight_validation_pending",
+  "last_completed": "P04.3_live_native_pdf_highlighting_verified",
+  "current_phase": "P07_official_hackathon_submission_pending",
   "completed_phases": [
     "P00",
     "P01",
@@ -17,7 +17,8 @@
     "P06-offline",
     "P06.5-offline",
     "LP-01",
-    "P03.2"
+    "P03.2",
+    "P04.3"
   ],
   "phases": {
     "P00": "complete",
@@ -25,7 +26,7 @@
     "P02": "complete",
     "UI-01": "complete",
     "P03": "complete_for_text_extract_compare_rerank; broader document cases not yet verified",
-    "P04": "partial_live_pdf_annotation_unverified",
+    "P04": "verified_real_clocked_compare_pdf_marked_highlight_on_fictional_fixtures; custom uploads not verified",
     "P05": "complete_offline",
     "P06": "complete_local_but_production_http_unverified",
     "P07": "audit_release_deployed_submission_unconfirmed",
@@ -40,7 +41,7 @@
     "public_deployment": "Vercel reported audit release 469d3037f1271afead81f59ec0827ef6fcc994fb as READY production, with stable alias ripple-consequence-engine.vercel.app.",
     "demo_no_paid_requests": true,
     "protected_verifier": "Implemented and fake-SDK tested; requires explicit admin token, expiry, flag and separate temporary redeployment",
-    "pdf_native_marking": "Implemented with SDK marked_pdf call, mock-only; actual annotation is unknown",
+    "pdf_native_marking": "PASS: Real Clocked Compare PDF highlight returned genuine annotated output. 1 /Highlight in prior policy, 4 /Highlight in current policy; both one page. PDF rendering and pypdf confirmed.",
     "source_lens": "Verbatim source fragment highlight, page-aware original PDF navigation in browser; not the SDK native marked PDF",
     "repository": "debdutta1777/ripple-consequence-engine",
     "production_url": "https://ripple-consequence-engine.vercel.app/",
@@ -62,17 +63,28 @@
     "verifier_cleanup": "Temporary settings set to ENABLE_VERIFICATION=false and RIPPLE_VERIFY_UNTIL=0. Production deployment dpl_6UNUeq5mRMGHeRSjSW6kxjnxFg47 READY with public alias. Temporary runner cleanup requested.",
     "clocked_live_workflow_run_url": "https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42693887137",
     "clocked_billed_credits_for_test": 24,
-    "clocked_live_pdf_annotations": "UNVERIFIED: no live PDF highlighting request has been made."
+    "clocked_live_pdf_annotations": "PASS: authenticated GitHub Actions 42695749607, job 129427019985. Verdict conflicts (1); marked PDF files validated, 5 native /Highlight annotations total; 9 SDK credits.",
+    "clocked_live_pdf_run_url": "https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42695749607",
+    "clocked_pdf_proof_artifact_id": 13707534934,
+    "clocked_pdf_proof_artifact_expires": "2026-11-16",
+    "clocked_native_pdf_usage": {
+      "request_count": 1,
+      "credits": 9,
+      "cost_usd": 0.001793
+    },
+    "clocked_verified_totals": {
+      "requests": 5,
+      "credits": 33
+    },
+    "manual_pdf_workflow": ".github/workflows/verify-clocked-pdf.yml (workflow_dispatch only)"
   },
   "blockers": [
-    "Live PDF highlighting and custom uploaded documents remain unverified; do not imply text smoke covers them.",
-    "The public production site still intentionally uses offline analysis for users; live text SDK calls were verified in GitHub Actions, not through the public frontend.",
-    "External hackathon submission/receipt not confirmed."
+    "Official hackathon submission/receipt not confirmed; core technical Clocked text and native-PDF fixture integrations have now passed.",
+    "Custom uploaded policies/scanned PDFs/exception-heavy rules remain unverified, and the public Studio intentionally runs a credit-free deterministic preview."
   ],
   "next_actions": [
-    "Verify native PDF Compare/highlight with one separately authorized restricted GitHub Actions job; inspect authentic marked PDF output.",
-    "After any required parsing adjustments, repeat local and hosted CI and update checkpoints.",
-    "Prepare and submit organizer entry and keep submission receipt; no API secrets in GitHub source."
+    "Submit official Clocked challenge entry with public URL, GitHub repository, judge walkthrough and authenticated verification logs; retain the submission receipt.",
+    "If real uploads or public live processing are required, add quota-backed server-side live analysis with explicit user messaging and validate non-fixture documents."
   ],
-  "notes": "2026-11-10 real Clocked text integration verified: 4 successful authenticated requests consumed SDK-reported 24 credits. Previous failures were CI setup action SHA pin issues, now corrected on main; verify CI run."
+  "notes": "P03.2 verified real text Extract x2, Compare x1, Rerank x1 (24 credits); P04.3 verified real SDK-native Compare PDF highlighted output (9 credits). Five authenticated calls used 33 SDK-reported credits. Both workflows are manually runnable; no secrets committed."
 }
