@@ -1,9 +1,9 @@
 {
   "project": "Ripple — The Consequence Engine",
-  "checkpoint_version": 17,
+  "checkpoint_version": 18,
   "last_updated": "2026-11-10",
-  "last_completed": "TRY-03_live_auth_and_new_PDF_qa",
-  "current_phase": "P07_official_submission_receipt_pending",
+  "last_completed": "SUB-01_submission_materials_prepared_and_deployment_verified",
+  "current_phase": "P07_user_must_submit_official_entry_and_preserve_receipt",
   "completed_phases": [
     "P00",
     "P01",
@@ -21,7 +21,8 @@
     "P04.3",
     "TRY-01",
     "TRY-02",
-    "TRY-03"
+    "TRY-03",
+    "SUB-01"
   ],
   "phases": {
     "P00": "complete",
@@ -36,7 +37,8 @@
     "LP-01": "complete_deployed",
     "TRY-01": "complete_offline_public_uploaded_pdf_and_cohort_workflow",
     "TRY-02": "complete_and_deployed",
-    "TRY-03": "complete: public PDF upload and deterministic results + authenticated Clocked text suite verified; native highlights unavailable on newly formatted pair"
+    "TRY-03": "complete: public PDF upload and deterministic results + authenticated Clocked text suite verified; native highlights unavailable on newly formatted pair",
+    "SUB-01": "complete: up-to-date judge demo and entry text committed; offline 80-second updated showcase prepared; official organizer entry NOT confirmed"
   },
   "verified": {
     "python_tests": "45 passed on 2026-11-09 (offline, including preview strictness)",
@@ -144,17 +146,34 @@
       "artifact_id": 13716113325,
       "expires": "2026-11-16",
       "source": "github workflow actions 42713532903"
+    },
+    "submission_readiness_2026_11_10": {
+      "source_commit": "352ffd26cc997b3c7ae565d2ed25ee09aa6a3b14",
+      "ci": "GitHub Actions run 42739297129 successful",
+      "vercel": "Production dpl_E2pZncMCHG7TqvcPxwvMkwsw63uu READY on same code/docs commit",
+      "pages": "Landing /, interactive demo /studio, custom PDF workflow /try",
+      "judge_docs": [
+        "docs/SUBMISSION.md",
+        "docs/JUDGE_QUICKSTART.md",
+        "docs/JUDGE_DEMO.md",
+        "docs/JUDGE_VIDEO_SCRIPT.txt"
+      ],
+      "media": "Updated 80-second SILENT showcase rendered into user-downloadable conversation artifact from authentic UI screenshots and earlier actual Studio screen recording; not publicly hosted and not proof of live Clocked invocation in browser",
+      "timestamp": "2026-11-10",
+      "deadline_ist": "2026-11-11 10:29 IST",
+      "submission_receipt": "NOT CONFIRMED"
     }
   },
   "blockers": [
-    "External hackathon submission/official receipt not confirmed. Deadline 2026-11-10 23:59 Eastern / 2026-11-11 10:29 IST.",
-    "Public /try still intentionally performs deterministic parsing and GPA/income outcome evaluation. Real Clocked confirmation is out-of-band.",
-    "Native highlights were verified on simple original PDFs but are absent for newly styled PDF fixtures where Clocked returned zero spans; cannot promise marks on arbitrary documents."
+    "REQUIRES USER ACTION: official Clocked challenge entry has not been confirmed as submitted. Submit via https://clocked.rezolve.ai/challenge and retain receipt before 2026-11-11 10:29 IST.",
+    "A publicly accessible short demo video link may be useful for the entry; current updated video is a downloadable private conversation artifact, not uploaded to YouTube or another public host.",
+    "Public /try remains deterministic GPA/USD-income only; real Clocked authentication and SDK outputs were separately verified on fictional data. New styled pair returned no native PDF highlight spans."
   ],
   "next_actions": [
-    "Immediately submit Ripple to the official Clocked challenge with https://ripple-consequence-engine.vercel.app/, public GitHub repository, screenshots/video and proof links; retain submission confirmation.",
-    "Optional post-submission: add safe distributed quota-backed public Clocked analysis on uploaded documents; do not enable unrestricted anonymous paid routes.",
-    "If more sample data is needed, use anonymized synthetic inputs and keep unsupported policy clauses flagged as review."
+    "User must open official challenge form, enter Ripple name/overview/audience/demo link/public GitHub and how Clocked is used, plus required member details; submit and retain confirmation.",
+    "Optionally upload current 80-second showcase as unlisted/public video and add its link in the submission form.",
+    "Optionally publish a qualifying public LinkedIn post, actively tag official Clocked page, include #ClockedChallenge, and link the post to entry before deadline for People's Choice.",
+    "After user reports submission confirmation, verify the receipt and checkpoint the project as submitted."
   ],
   "notes": "P03.2 verified real text Extract x2, Compare x1, Rerank x1 (24 credits); P04.3 verified real SDK-native Compare PDF highlighted output (9 credits). Five authenticated calls used 33 SDK-reported credits. Both workflows are manually runnable; no secrets committed. TRY-01 delivered public two-PDF upload UI with optional applicant cohort CSV; no user authentication or paid calls. UI inspiration derived from user-supplied AuditEase screenshots; branding and layout are Ripple-specific."
 }
