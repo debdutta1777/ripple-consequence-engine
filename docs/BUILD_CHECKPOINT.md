@@ -195,3 +195,13 @@ After **every** phase: update both this human-readable file and `checkpoint.json
 - Proof artifact: `ripple-fresh-policy-live-proof`, ID `13716113325`, contains sanitized JSON report (expires Nov 16). Final successful run cost **19 credits**, excluding other troubleshooting tests.
 - Main branch keeps the private `verify-try-live.yml` workflow **manual-only**. Public `/try` is free deterministic GPA/income modeling, not a billed Clocked frontend. Secure secret remains only in Vercel/GitHub Actions.
 - **Submission deadline:** November 10, 2026 at 11:59 PM ET = November 11, 2026 10:29 AM IST. Organizer entry submission still needs a confirmed receipt.
+
+### SUB-01 — Final judge submission pack [2026-11-10; prepared, NOT submitted]
+- Replaced stale docs/SUBMISSION.md and docs/JUDGE_DEMO.md with accurate two-path /studio and /try instructions, verified SDK evidence, trust boundaries and current application behavior.
+- Added docs/JUDGE_QUICKSTART.md and docs/JUDGE_VIDEO_SCRIPT.txt; updated README entry-point links.
+- Documentation commit 352ffd26cc997b3c7ae565d2ed25ee09aa6a3b14 was checked by hosted CI run 42739297129 (success) and Vercel Production dpl_E2pZncMCHG7TqvcPxwvMkwsw63uu (READY).
+- Created a downloadable 80-second silent video showcase, using current Try It Yourself screenshot frames and actual earlier Studio screen recording; video is a local conversation artifact and has NOT been uploaded to a public host.
+- Prepared a download kit with submission text, fresh fictional PDFs, authentic Clocked verification proof, optional LinkedIn post text and screenshots. This kit is distributed to the user in the conversation, not committed to GitHub.
+- Corrected previous outdated statement that authenticated Clocked calls remained unverified. Real Clocked Extract, Compare, Rerank and earlier simple-file PDF highlights are logged; fresh styled PDFs returned zero PDF markup spans.
+- Organizer submission is **NOT confirmed**. Official deadline: Tuesday Nov 10, 2026 at 11:59 PM Eastern = Wednesday Nov 11, 2026 at 10:29 AM IST.
+- NEXT OWNER ACTION: submit through https://clocked.rezolve.ai/challenge, add team details and project URLs, optionally host the video/qualifying LinkedIn post, and share confirmation receipt.
