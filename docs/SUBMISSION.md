@@ -1,58 +1,59 @@
-# Hackathon submission draft — Ripple
+# Ripple — The Consequence Engine
 
-**Project name:** Ripple — The Consequence Engine  
-**Tagline:** Don't just compare what changed. Discover who it changes.  
-**Public demo:** https://ripple-consequence-engine.vercel.app/  
+**Tagline:** Don't just compare what changed. Discover who it changes.
+
+**Project URL:** https://ripple-consequence-engine.vercel.app/
+
+**Explore Demo:** https://ripple-consequence-engine.vercel.app/studio
+
+**Try It Yourself:** https://ripple-consequence-engine.vercel.app/try
+
 **Public repository:** https://github.com/debdutta1777/ripple-consequence-engine
 
-## Project description
+**Verified live Clocked test:** https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42713532903
 
-A scholarship policy is edited. A GPA threshold rises; an income ceiling changes. A document diff can point to the changed text, but it won't tell a program manager who loses eligibility or which changed clause caused the decision. Ripple closes that gap.
+**Native Clocked PDF highlight verification (separate fixture):** https://github.com/debdutta1777/ripple-consequence-engine/actions/runs/42695749607
 
-Ripple turns two policy versions into an interactive **Consequence Map** of before-and-after decisions for a fictional cohort. Select any path to see the exact conditions; use the **Decision Flip Explorer** to calculate which threshold needs to change; use the **Source Lens** to trace the verbatim evidence. In the **Rule Lab**, experiment with stricter or more inclusive proposals and watch all the outcome paths update instantly, without another AI call. Export a self-contained case proof card that clearly distinguishes actual source evidence from a hypothetical rule.
+**Recommended judged award focus:** Best Use of Verify / Compare / Rerank; also enter Best Overall if the form permits selection of multiple categories.
 
-The backend is designed to use Clocked **Extract** (verbatim rule excerpts), **Compare** (cross-document consistency), and **Rerank** (prioritization of relevant clauses). A protected sample-PDF path also implements Clocked's native `return_pdf="highlight"`. The rule engine deliberately handles only explicit GPA and income constraints; missing or exceptional conditions result in **Needs review**. The public interactive sample is synthetic and does not make paid calls.
+## Short overview (paste into the submission form)
 
-**Important before publishing this paragraph:** update this description with **actual** integration-test evidence only if the protected Clocked test has succeeded. Never imply the public synthetic results are real Clocked responses.
+A policy change can look tiny on paper and enormous in its consequences. Ripple helps reviewers compare two scholarship-policy versions, inspect the exact rules that changed, and model which applicants gain or lose eligibility. Its interactive Consequence Map, Decision Flip Explorer and Rule Lab turn a static document diff into clear, source-linked before/after decisions. Judges can explore a fictional demo or upload their own text-based policies and an optional applicant CSV. The bounded public preview uses transparent GPA and USD-income rules; uncertain conditions are flagged for review. Separately, an authenticated Clocked SDK pipeline uses Extract to capture evidence, Compare to identify conflicting provisions and Rerank to prioritize relevant clauses. Real API results and a native PDF highlight proof are available in public GitHub Actions logs. No login is required for the demo.
 
-## What makes it different
+## Why it matters
 
-1. **Consequence-first rather than document-first:** a visual map connecting each applicant's before/after eligibility decision.
-2. **Instant policy time travel:** edit the modeled policy (not a student's attributes) to simulate how the whole cohort moves.
-3. **Counterfactual flip paths:** show the exact minimum modeled threshold changes that would reverse a given case's outcome.
-4. **Explainability with proof:** source-language highlights, version-aware evidence, a transparent API trace, and printable proof cards.
-5. **Spend-safe demonstration:** optional live calls are protected; experiments and offline PDF preview never consume Clocked credits.
+Scholarship administrators, policy teams and auditors need to answer more than “what words changed?” They need to know who may be affected, why, and which source clause supports the conclusion. Ripple makes the effect of a change explorable while keeping unsupported rules out of automated eligibility decisions.
 
-## Technically important choices
+## Live demo / showcase steps
 
-- FastAPI + dependency-free responsive HTML/CSS/JavaScript for a single Vercel deployment.
-- Python `clocked-sdk==0.7.0`, `pypdf`, and a narrow deterministic eligibility evaluator.
-- Bounded PDF uploads: 2 MB, 12 pages, and 12k characters; no app-layer persistent storage.
-- Separate security, test and checkpoint logs; `pytest` offline checks and isolated Chromium interaction tests.
-- Credible negative results: unsupported rules and missing source evidence are never automatically called eligible.
+1. Open the main landing page and select **Try It Yourself**.
+2. Download and upload the two fresh fictional documents:
+   - 2025: https://ripple-consequence-engine.vercel.app/assets/samples/judge-policy-2025.pdf
+   - 2026: https://ripple-consequence-engine.vercel.app/assets/samples/judge-policy-2026.pdf
+3. Select the 16-person fictional sample and click **Analyze policy impact**.
+4. Inspect the modeled counts: **4 lost eligibility; 2 gained; 2 remained eligible; 8 remained ineligible; 0 require review**. These apply only to the fictional sample cohort and the supported GPA / income constraints.
+5. Open individual decisions, compare source clauses, and export a CSV. For a completely different cohort, upload an applicant CSV instead.
+6. Return to the landing page and select **Explore Demo** to use the Consequence Map, Rule Lab, Decision Flip Explorer and guided tour.
+7. Show the authenticated Clocked workflow run and the verified API output logs as independent evidence.
 
-## Judges' 90-second experience
+## How Clocked is used
 
-Open the sample. Follow any red path in the Consequence Map, inspect why it lost eligibility, activate a more restrictive Rule Lab preset to watch changes propagate, reset, then export the source-backed proof card. The full two-minute guided walkthrough is in `docs/JUDGE_DEMO.md` and within the **Guided tour** button in the app.
+The private backend integration implements **Extract**, **Compare**, and **Rerank** with the official Clocked Python SDK. Real tests extracted the fresh 2025 and 2026 scholarship thresholds (GPA 3.25 / 3.65; USD-income ceiling 52,000 / 66,000), detected a conflict, and returned four reranked evidence items. A separate genuine native annotated-PDF proof on the original simple policy pair generated five PDF Highlight annotations.
 
-## Submission checklist (must be confirmed by the owner)
+**Important qualification:** The public Try It Yourself flow performs real PDF text parsing and local deterministic impact computation without paid Clocked calls. Authenticated Clocked verification was run separately using a repository secret in GitHub Actions. On the freshly formatted 2025/2026 PDFs, Clocked Compare returned a conflict but no native PDF highlight spans; do not claim it produced highlighted copies of these particular files. Complex policy conditions, scanned PDFs and arbitrary legal eligibility rules are not automatically supported.
 
-- [ ] Latest GitHub commit is deployed and public sample loads in a private/incognito browser.
-- [ ] Screenshot or demo video shows actual UI, not a mockup.
-- [ ] Verified Clocked API call result recorded in `docs/VERIFICATION_RESULTS.md` or transparently marked unverified.
-- [ ] A short demo video URL is supplied, if required by the organizer.
-- [ ] Team details, project links, and challenge-specific fields are completed on the organizer's page.
-- [ ] Submission is **actually submitted and confirmed** by November 10, 2026, 11:59 PM US Eastern Time.
+## Implementation and reproducibility
 
-**This document is a submission draft, not proof that the project has been submitted.**
+FastAPI, Python, clocked-sdk 0.7.0, pypdf, HTML/CSS/JavaScript, Vercel, GitHub Actions. Public demo is light-mode first, responsive, no login and no visitor API charges. Server PDF inputs are bounded, and original documents are not retained in project storage by the application. Source, automated tests, real Clocked evidence, checkpoint history and build instructions are in the public repository. Latest tests reported 53 passing backend cases and passing browser QA across mobile and desktop.
 
-## Release receipt (source + Vercel)
+## Required manual submission steps
 
-- Main release: [5f93b5f](https://github.com/debdutta1777/ripple-consequence-engine/commit/5f93b5fa167e7efd4171d997e23aad2a5deaad63)
-- Vercel: Production READY for that exact commit; stable public alias attached.
-- Recorded media: 61-second synthetic UI walkthrough supplied as a separate MP4 artifact, not uploaded publicly or submitted yet.
-- Reminder: a Vercel deployment is **not** a hackathon submission confirmation.
+- [ ] Open https://clocked.rezolve.ai/challenge using your Clocked account.
+- [ ] Submit the project name, short overview, audience/problem and links above.
+- [ ] Include the source repository and API evidence links.
+- [ ] Add a demo URL or publicly accessible video as requested by the form.
+- [ ] Fill in your own team member name, email and GitHub handle, and verify eligibility.
+- [ ] Select relevant judged award categories. Optional People's Choice requires the qualifying public LinkedIn post and entry URL by the deadline.
+- [ ] Click Submit/Save and keep the **official confirmation/receipt**. Registration alone is not submission.
 
-### Audit note (2026-11-09)
-
-An additional free **Preview policy changes** button now recalculates the fictional cohort for narrow, explicit rules from a user's uploaded or pasted text. This uses local deterministic parsing, **not** Clocked. The project has 45 passing offline tests, a Chromium UI regression, and a real FastAPI TestClient/Chromium upload-preview test. Authenticated Clocked results remain unverified; do not claim them as completed during judging.
+**Deadline: Wednesday, November 11, 2026, 10:29 AM IST** (Tuesday, November 10, 2026, 11:59 PM US Eastern). Leave ample margin for form or upload issues.

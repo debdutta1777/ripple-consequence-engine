@@ -1,0 +1,19 @@
+RIPPLE — SUBMISSION VIDEO NARRATION (~90 seconds)
+
+[0:00–0:12 | Landing page]
+A scholarship policy changes by just a few lines. But behind those lines are real eligibility consequences. Ripple turns a document comparison into a picture of who is affected and why.
+
+[0:12–0:30 | Try It Yourself: upload]
+Judges can explore the fictional demo, or upload two different policy PDFs. We’ll use our new 2025 and 2026 scholarship policies. Ripple extracts selectable text, compares the stated requirements and shows each completed analysis stage.
+
+[0:30–0:50 | Results]
+The minimum GPA rises from 3.25 to 3.65 while the income ceiling increases from 52 to 66 thousand dollars. In this fictional cohort of sixteen, four applicants lose eligibility and two gain it. Every count is deterministic, so the model is reproducible.
+
+[0:50–1:05 | Evidence and case detail]
+We can inspect exactly which clause changed, select an affected applicant, view the before-and-after decision and export the outcomes. For complex or ambiguous rules, Ripple flags cases for human review instead of inventing a decision.
+
+[1:05–1:20 | Explore Demo / Rule Lab]
+The Consequence Map makes every outcome shift visible. In the Rule Lab we can try hypothetical thresholds instantly and trace the decision flips back to the modeled conditions.
+
+[1:20–1:30 | Clocked proof]
+Clocked's Extract, Compare and Rerank were independently authenticated and tested on these new policy texts. The public trial uses credit-free local modeling; our verified Clocked results are linked in the repository. Ripple doesn't just show what changed. It shows what that change means.

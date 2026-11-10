@@ -2,7 +2,7 @@
 
 > **Don't just compare what changed. Discover who it changes.**
 
-[Live demo](https://ripple-consequence-engine.vercel.app/) · [Two-minute judge walkthrough](docs/JUDGE_DEMO.md) · [Submission draft](docs/SUBMISSION.md) · [Build checkpoints](docs/BUILD_CHECKPOINT.md)
+[Landing page](https://ripple-consequence-engine.vercel.app/) · [Explore Demo](https://ripple-consequence-engine.vercel.app/studio) · [Try It Yourself](https://ripple-consequence-engine.vercel.app/try) · [2-minute Judge Quickstart](docs/JUDGE_QUICKSTART.md) · [Submission-ready details](docs/SUBMISSION.md) · [Clocked verification](docs/VERIFICATION_RESULTS.md) · [Build checkpoints](docs/BUILD_CHECKPOINT.md)
 
 A **consequence-first** experiment for the 2026 Clocked Build Challenge. Ripple compares two fictional scholarship policies and shows how a rule edit changes decisions for a synthetic cohort. Unlike a text-only diff, it makes those changes inspectable as interactive paths, testable what-ifs, and traceable evidence. **The app defaults to light mode**, with optional dark mode.
 
